@@ -19,14 +19,16 @@ sql_commands -
 
 functions -
 connect() - return if connected
+disconnect()
 
 get_random_number() - return randomInt
 generate_random_id() - return random char(36)
+table_id_exists(table_name, id) - returns boolean - checks if id exists in a particular table
 
-add_category(category_id, category_parent, category_name)
+add_category(category_parent, category_name)
 modify_category(category_id, data)
 remove_category(category_id)
-category_id_exists(category_name)
+category_name_exists(category_name)
 get_category(category_id) - return category table
 
 add_user(user_name, user_active)
