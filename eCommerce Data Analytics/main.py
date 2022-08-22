@@ -3,5 +3,4 @@ import sql_commands as sql
 
 mySQL = sql.SQL()
 
-# mySQL.add_category("kitchen")
-print(mySQL.getTable_from_id("category", 1))
+mySQL.modify_event_type(8549804432497906157, "Purchase")
