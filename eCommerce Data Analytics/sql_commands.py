@@ -262,7 +262,21 @@ class SQL:
         except Exception as e:
             print(e)
 
-    
+
+    def add_product(self, product_name, **data):
+        try:
+            pass
+        except Exception as e:
+            print(e)
+
+
+    def modify_product(self, product_id, **data):
+        try:
+            pass
+        except Exception as e:
+            print(e)
+
+
     def getUserSession_between_date_exists(self, user_id, start_date, end_date) -> bool:
         try:
             pass
