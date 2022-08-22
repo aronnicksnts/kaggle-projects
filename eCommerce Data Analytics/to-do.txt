@@ -32,10 +32,9 @@ modify_category(category_id, data)
 remove_category(category_id)
 =====================
 
-
-add_user(user_name, user_active)
+add_user(user_name)
 modify_user(user_id, data)
-
+=======================
 add_brand(brand_name)
 modify_brand(brand_id, data)
 
@@ -49,7 +48,7 @@ modify_product(product_id, data)
 add_user_session(user_session_id, data)
 modify_user_session(user_session_id, data)
 
-get_user_session_between_datetime_exists(user_id, datetime) - boolean
+get_user_session_between_date_exists(user_id, start_date, end_date) - boolean
 
 add_user_activity(user_id, **data)
 modify_user_activity(user_activity_id, data)
