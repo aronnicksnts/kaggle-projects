@@ -44,11 +44,7 @@ class SQL:
             elif type(category_parent) != int:
                 raise TypeError("category_parent is not an integer")
             category_id = self.generate_random_number()
-            if category_parent == 0:
-                query = "INSERT INTO CATEGORY (category_id, category_name) VALUES " \
-                    f"({category_id}, '{category_name}')"
-            else:
-                query = "INSERT INTO CATEGORY (category_id, category_parent, category_name) VALUES " \
+            query = "INSERT INTO CATEGORY (category_id, category_parent, category_name) VALUES " \
             f"({category_id}, {category_parent}, '{category_name}');"
             self.cursor.execute(query)
             self.conn.commit()
@@ -60,13 +56,14 @@ class SQL:
     def modify_category(self, category_id, **data):
         try:
             #Check for errors misinput
-            if not self.table_id_exists("category",category_id):
+            if not self.fromTable_id_exists("category",category_id):
                 raise NameError(f"category_id {category_id} does not exist in the database")
             for key in data.keys():
                 if key not in ['category_name', 'category_parent', 'category_active']:
                     raise NameError(f"{key} is not an acceptable variable for modify category")
-            if 'category_parent' in data.keys() and not type(data['category_parent']) == int:
-                raise TypeError("category_parent is should be an integer")
+            if 'category_parent' in data.keys():
+                if not type(data['category_parent']) == int:
+                    raise TypeError("category_parent is should be an integer")
             if 'category_active' in data.keys() and not type(data['category_active']) == int:
                 raise TypeError("category_active is should be an integer")
             if 'category_name' in data.keys() and not type(data['category_name']) == str:
@@ -79,17 +76,45 @@ class SQL:
                 else:
                     query += f"{key} = '{value}', "
             query = query[:-2] + f" WHERE category_id = {category_id}"
-            print(query)
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
             print(e)
-    
 
-    def table_id_exists(self, table_name, id) -> bool:
+    def remove_category(self, category_id):
+        try:
+            if not self.fromTable_id_exists('category', category_id):
+                raise NameError(f"category_id {category_id} does not exist in the database")
+            
+            query = f"UPDATE CATEGORY SET 'category_active' = 0 WHERE category_id = {category_id}"
+            self.cursor.execute(query)
+            self.conn.commit()
+        except Exception as e:
+            print(e)
+
+    def fromTable_name_exists(self, table_name, name) -> bool:
+        try:
+            query = f"SELECT EXISTS (SELECT * FROM {table_name} WHERE {table_name}_name = '{name}')"
+            self.cursor.execute(query)
+            return self.cursor.fetchall()[0][0]
+            
+
+        except Exception as e:
+            print(e)
+    
+    def fromTable_id_exists(self, table_name, id) -> bool:
         query = f"SELECT EXISTS (SELECT * FROM {table_name} WHERE {table_name}_id = {id})"
-        print(query)
         self.cursor.execute(query)
         return self.cursor.fetchall()[0][0]
 
 
+    def getTable_from_id(self, table_name, id):
+        try:
+            query = f"SELECT * FROM {table_name} WHERE {table_name}_id = {id}"
+            self.cursor.execute(query)
+            table = self.cursor.fetchone()
+            if table is None:
+                return tuple()
+            return table
+        except Exception as e:
+            print(e)

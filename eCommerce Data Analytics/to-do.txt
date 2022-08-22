@@ -23,50 +23,39 @@ disconnect()
 
 get_random_number() - return randomInt
 generate_random_id() - return random char(36)
-table_id_exists(table_name, id) - returns boolean - checks if id exists in a particular table
+fromTable_id_exists(table_name, id) - returns boolean - checks if id exists in a particular table
+fromTable_name_exists(table_name, name) - returns boolean
+getTable_from_id(table_name, id) - returns the values of the id from the table
 
 add_category(category_parent, category_name)
 modify_category(category_id, data)
 remove_category(category_id)
-category_name_exists(category_name)
-get_category(category_id) - return category table
 
 add_user(user_name, user_active)
 modify_user(user_id, data)
 remove_user(user_id)
-user_exists(user_id) - return boolean
-get_user(user_id) - return user table
 
 add_brand(brand_name)
 modify_brand(brand_id, data)
 remove_brand(brand_id)
-brand_exists(brand_name) - return boolean
-get_brand(brand_id) - return brand table
 
 add_event_type(event_type_name)
 modify_event_type(event_type_id, data)
 remove_event_type(event_type_id)
-get_event_type(event_type_id) - return event_type table
 
 add_product(product_id, data)
 modify_product(product_id, data)
 remove_product(product_id)
-product_exists(product_id)
-product_name_exists(product_name) - return boolean
-get_product(product_id) - return product table
 
 add_user_session(user_session_id, data)
 modify_user_session(user_session_id, data)
 remove_user_session(user_session_id)
-get_user_session(user_session_id) -return user_session table
-user_session_exists(user_session_id) - return boolean
 get_user_session_between_datetime_exists(user_id, datetime) - boolean
 
 add_user_activity(data)
 modify_user_activity(user_activity_id, data)
 remove_user_activity(user_activity_id)
-get_user_activity(user_activity_id) - return user_activity table
-user_activity_exists(user_activity_id) - return boolean
+
 get_all_user_activity(user_id) - return all rows of user_activity of user
 get_user_activity_between(user_id, startTime, endTime) - get user activity between timeframe
 get_user_activity_event_type(user_id, event_type_id) - get user activity depending on event type
@@ -77,10 +66,8 @@ get_user_activity_session_id(user_session_id) - return all rows of user_activity
 get_purchase_number_product(product_id) - return count of how many times product has been purchased
 get_view_number_product(product_id) - return count of how many times product has been viewed
 get_add_cart_product(product_id) - returns count of how many times product has been added to cart
-product_add_view(product_id)
-product_add_cart(product_id)
-product_add_purchased(product_id)
-product_remove_cart(product_id)
+product_add_event_type(product_id, event_type)
+
 
 user_add_purchase(user_id, user_spent) - When user purchases/refunds a product
 user_add_active_time(user_id, amount_time) - Once a user session ends add total time
