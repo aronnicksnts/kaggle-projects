@@ -30,31 +30,29 @@ getTable_from_id(table_name, id) - returns the values of the id from the table
 add_category(category_parent, category_name)
 modify_category(category_id, data)
 remove_category(category_id)
+=====================
+
 
 add_user(user_name, user_active)
 modify_user(user_id, data)
-remove_user(user_id)
 
 add_brand(brand_name)
 modify_brand(brand_id, data)
-remove_brand(brand_id)
 
 add_event_type(event_type_name)
 modify_event_type(event_type_id, data)
-remove_event_type(event_type_id)
 
 add_product(product_id, data)
 modify_product(product_id, data)
-remove_product(product_id)
+
 
 add_user_session(user_session_id, data)
 modify_user_session(user_session_id, data)
-remove_user_session(user_session_id)
+
 get_user_session_between_datetime_exists(user_id, datetime) - boolean
 
-add_user_activity(data)
+add_user_activity(user_id, **data)
 modify_user_activity(user_activity_id, data)
-remove_user_activity(user_activity_id)
 
 get_all_user_activity(user_id) - return all rows of user_activity of user
 get_user_activity_between(user_id, startTime, endTime) - get user activity between timeframe
