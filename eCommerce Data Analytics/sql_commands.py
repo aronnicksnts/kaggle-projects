@@ -97,6 +97,17 @@ class SQL:
             print(e)
     
 
+    def getTable_from_name(self, table_name, name):
+        try:
+            query = f"SELECT * FROM {table_name} WHERE {table_name}_name = {name}"
+            self.cursor.execute(query)
+            table = self.cursor.fetchone()
+            if table is None:
+                return tuple()
+            return table
+        except Exception as e:
+            print(e)
+
     def user_session_id_exists(self, user_session_id) -> bool:
         query = f"SELECT EXISTS (SELECT * FROM user_session WHERE user_session_id = '{user_session_id}')"
         self.cursor.execute(query)
@@ -312,9 +323,28 @@ class SQL:
             print(e)
 
 
-    def add_product(self, product_name, **data):
+    def add_product(self, product_id, product_price, brand_id = None):
         try:
-            pass
+            if self.fromTable_id_exists('product', product_id):
+                raise NameError(f"{product_id} already exists in the database")
+            if type(product_id) != int:
+                raise TypeError("product_name should be a string")
+            if brand_id and self.fromTable_id_exists('brand', brand_id):
+                raise ValueError(f"{brand_id} does not exist in the database")
+            if product_price <= 0:
+                raise ValueError("product_price cannot be lower than or equal to 0")
+            if product_price is None:
+                raise ValueError("product needs to have a price")
+
+            if brand_id:
+                query = "INSERT INTO product (product_id, product_price, brand_id) VALUES " \
+                    f"({product_id}, {product_price}, {brand_id})"
+            else:
+                query = "INSERT INTO product (product_id, product_price) VALUES " \
+                    f"({product_id}, {product_price})"
+            self.cursor.execute(query)
+            self.conn.commit()
+            print("Added product successfully")
         except Exception as e:
             print(e)
 
