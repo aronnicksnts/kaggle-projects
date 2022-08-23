@@ -1,6 +1,8 @@
 from datetime import datetime
+from itertools import product
 from multiprocessing.sharedctypes import Value
 from sqlite3 import connect
+from tokenize import Double
 import mysql.connector
 from mysql.connector import Error
 import json
@@ -99,12 +101,25 @@ class SQL:
 
     def getTable_from_name(self, table_name, name):
         try:
-            query = f"SELECT * FROM {table_name} WHERE {table_name}_name = {name}"
+            query = f"SELECT * FROM {table_name} WHERE {table_name}_name = '{name}'"
             self.cursor.execute(query)
             table = self.cursor.fetchone()
             if table is None:
                 return tuple()
             return table
+        except Exception as e:
+            print(e)
+
+    def getId_from_name(self, table_name, name):
+        try:
+            query = f"SELECT {table_name}_id FROM {table_name} WHERE {table_name}_name = '{name}'"
+            self.cursor.execute(query)
+            id = self.cursor.fetchone()
+            if id:
+                id = id[0]
+            if id is None:
+                return None
+            return id
         except Exception as e:
             print(e)
 
@@ -299,6 +314,8 @@ class SQL:
     
     def modify_user_session(self, user_session_id, **data):
         try:
+            if not self.fromTable_id_exists('user_session', user_session_id):
+                raise ValueError("user_session_id does not exist in the database")
             for key in data.keys():
                 if key not in ['user_id', 'user_session_start_time', 'user_session_end_time', 'user_session_active']:
                     raise NameError(f"{key} is not an acceptable variable for modifying user_session")
@@ -323,14 +340,14 @@ class SQL:
             print(e)
 
 
-    def add_product(self, product_id, product_price, brand_id = None):
+    def add_product(self, product_id: int, product_price: float, brand_id: int = None):
         try:
             if self.fromTable_id_exists('product', product_id):
                 raise NameError(f"{product_id} already exists in the database")
             if type(product_id) != int:
                 raise TypeError("product_name should be a string")
-            if brand_id and self.fromTable_id_exists('brand', brand_id):
-                raise ValueError(f"{brand_id} does not exist in the database")
+            if brand_id and not self.fromTable_id_exists('brand', brand_id):
+                raise ValueError(f"{brand_id} brand_id does not exist in the database")
             if product_price <= 0:
                 raise ValueError("product_price cannot be lower than or equal to 0")
             if product_price is None:
@@ -351,7 +368,48 @@ class SQL:
 
     def modify_product(self, product_id, **data):
         try:
-            pass
+            if not self.fromTable_id_exists('product', product_id):
+                raise ValueError("product_id does not exist in the database")
+            for key in data.keys():
+                if key not in ['product_name', 'product_price', 'brand_id', 'product_active',
+                'product_viewed', 'product_added_cart', 'product_removed_cart', 'product_purchased']:
+                    raise NameError(f"{key} is not an acceptable variable for modifying product")
+            if 'product_name' in data.keys() and (type(data['product_name']) != str or data["product_name"] == None):
+                raise TypeError("product_name is not a string")
+            if 'product_price' in data.keys() and type(data['product_price']) != float:
+                raise TypeError("product_price is not a float")
+            if 'brand_id' in data.keys():
+                if not self.fromTable_id_exists('brand', data['brand_id']):
+                    raise ValueError(f"The brand_id {data['brand_id']} does not exist in the database")
+                if type(data['brand_id']) != int:
+                    raise TypeError("brand_id is not an integer")
+            if 'product_active' in data.keys() and type(data['product_active']) != bool:
+                raise TypeError("product_active is not a boolean")
+            if 'product_viewed' in data.keys():
+                if type(data['product_viewed']) != int:
+                    raise TypeError("product_viewed is not an integer")
+                if data['product_viewed'] < 0:
+                    raise ValueError("product_viewed cannot be less than 0")
+            if 'product_added_cart' in data.keys():
+                if type(data['product_added_cart']) != int:
+                    raise TypeError("product_added_cart is not an integer")
+                if data['product_added_cart'] < 0:
+                    raise ValueError("product_added_cart cannot be less than 0")
+            if 'product_removed_cart' in data.keys():
+                if type(data['product_removed_cart']) != int:
+                    raise TypeError("product_removed_cart is not an integer")
+                if data['product_removed_cart'] < 0:
+                    raise ValueError("product_removed_cart cannot be less than 0")
+            if 'product_purchased' in data.keys():
+                if type(data['product_purchased']) != int:
+                    raise TypeError("product_purchased is not an integer")
+                if data['product_purchased'] < 0:
+                    raise ValueError("product_purchased cannot be less than 0")
+            
+            query = self.combine_query('product', product_id, data)
+            self.cursor.execute(query)
+            self.conn.commit()
+            print(f"Product {product_id} successfully modified")
         except Exception as e:
             print(e)
 
