@@ -1,4 +1,5 @@
 from datetime import datetime
+from multiprocessing.sharedctypes import Value
 from sqlite3 import connect
 import mysql.connector
 from mysql.connector import Error
@@ -266,7 +267,7 @@ class SQL:
     def add_user_session(self, user_session_id, user_id, user_session_datetime):
         try:
             user_session_datetime = self.convert_str_datetime(user_session_datetime)
-            
+
             if self.user_session_id_exists(user_session_id):
                 raise ValueError("user_session_id already exists in the database")
             if not uuid.UUID(str(user_session_id), version=4):
@@ -287,7 +288,26 @@ class SQL:
     
     def modify_user_session(self, user_session_id, **data):
         try:
-            pass
+            for key in data.keys():
+                if key not in ['user_id', 'user_session_start_time', 'user_session_end_time', 'user_session_active']:
+                    raise NameError(f"{key} is not an acceptable variable for modifying user_session")
+            if 'user_session_start_time' in data.keys():
+                data['user_session_start_time'] = self.convert_str_datetime(data['user_session_start_time'])
+                if not isinstance(data['user_session_start_time'], datetime.datetime):
+                    raise TypeError("user_session_start_time is not a datetime")
+            if 'user_session_end_time' in data.keys():
+                data['user_session_end_time'] = self.convert_str_datetime(data['user_session_end_time'])
+                if not isinstance(data['user_session_end_time'], datetime.datetime):
+                    raise TypeError("user_session_end_time is not a datetime")
+            if 'user_id' in data.keys() and not self.fromTable_id_exists('user', data['user_id']):
+                raise ValueError("user_id does not exist in the database")
+            if 'user_session_active' in data.keys() and not type(data['user_session_active']) == bool:
+                raise TypeError("user_session_active is not a boolean")
+
+            query = self.combine_query('user_session', f"'{user_session_id}'", data)
+            self.cursor.execute(query)
+            self.conn.commit()
+            print(f"{user_session_id} user_session successfully modified")
         except Exception as e:
             print(e)
 
