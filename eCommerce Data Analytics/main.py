@@ -1,6 +1,8 @@
 from unicodedata import category
 import sql_commands as sql
+import datetime
+import uuid
 
 mySQL = sql.SQL()
 
-mySQL.modify_event_type(8549804432497906157, "Purchase")
+mySQL.add_user_session(uuid.uuid4(), 503, '2019-11-01 00:00:00 UTC')

@@ -5,7 +5,6 @@ from mysql.connector import Error
 import json
 import uuid
 import datetime
-import logging
 
 class SQL:
 
@@ -95,6 +94,18 @@ class SQL:
             return table
         except Exception as e:
             print(e)
+    
+
+    def user_session_id_exists(self, user_session_id) -> bool:
+        query = f"SELECT EXISTS (SELECT * FROM user_session WHERE user_session_id = '{user_session_id}')"
+        self.cursor.execute(query)
+        if self.cursor.fetchone()[0] == 0:
+            return False
+        return True
+
+    @staticmethod
+    def convert_str_datetime(string_datetime):
+        return datetime.datetime.strptime(string_datetime[:-4], '%Y-%m-%d %H:%M:%S')
 
 
     def add_category(self, category_name: str, category_parent: int =  0):
@@ -254,17 +265,19 @@ class SQL:
     
     def add_user_session(self, user_session_id, user_id, user_session_datetime):
         try:
-            if self.fromTable_id_exists("user_session", user_session_id):
+            user_session_datetime = self.convert_str_datetime(user_session_datetime)
+            
+            if self.user_session_id_exists(user_session_id):
                 raise ValueError("user_session_id already exists in the database")
-            if not type(user_session_id) == str and len(user_session_id) == 36:
-                raise TypeError("user_session_id is not an id")
+            if not uuid.UUID(str(user_session_id), version=4):
+                raise TypeError("user_session_id is not an id or a valid id")
             if not self.fromTable_id_exists("user", user_id):
                 raise ValueError("user_id does not exist in the database")
             if not isinstance(user_session_datetime, datetime.datetime):
                 raise TypeError("user_session_datetime is not a datetime")
-            
+        
             query = "INSERT INTO user_session (user_session_id, user_id, user_session_start_time, " \
-            f"user_session_end_time) VALUES ({user_session_id}, {user_id}, {user_session_datetime}, {user_session_datetime})"
+            f"user_session_end_time) VALUES ('{user_session_id}', {user_id}, '{user_session_datetime}', '{user_session_datetime}')"
             self.cursor.execute(query)
             self.conn.commit()
             print("Added user_session successfully")

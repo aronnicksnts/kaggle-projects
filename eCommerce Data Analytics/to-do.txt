@@ -41,11 +41,11 @@ modify_brand(brand_id, data)
 add_event_type(event_type_name)
 modify_event_type(event_type_id, data)
 ==========================
-add_product(product_id, data)
-modify_product(product_id, data)
-
 add_user_session(user_session_id, data)
 modify_user_session(user_session_id, data)
+
+add_product(product_id, data)
+modify_product(product_id, data)
 
 get_user_session_between_date_exists(user_id, start_date, end_date) - boolean
 
