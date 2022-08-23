@@ -1,8 +1,11 @@
+from datetime import datetime
 from sqlite3 import connect
 import mysql.connector
 from mysql.connector import Error
 import json
 import uuid
+import datetime
+import logging
 
 class SQL:
 
@@ -249,9 +252,22 @@ class SQL:
             print(e)
 
     
-    def add_user_session(self, user_session_id, **data):
+    def add_user_session(self, user_session_id, user_id, user_session_datetime):
         try:
-            pass
+            if self.fromTable_id_exists("user_session", user_session_id):
+                raise ValueError("user_session_id already exists in the database")
+            if not type(user_session_id) == str and len(user_session_id) == 36:
+                raise TypeError("user_session_id is not an id")
+            if not self.fromTable_id_exists("user", user_id):
+                raise ValueError("user_id does not exist in the database")
+            if not isinstance(user_session_datetime, datetime.datetime):
+                raise TypeError("user_session_datetime is not a datetime")
+            
+            query = "INSERT INTO user_session (user_session_id, user_id, user_session_start_time, " \
+            f"user_session_end_time) VALUES ({user_session_id}, {user_id}, {user_session_datetime}, {user_session_datetime})"
+            self.cursor.execute(query)
+            self.conn.commit()
+            print("Added user_session successfully")
         except Exception as e:
             print(e)
 
