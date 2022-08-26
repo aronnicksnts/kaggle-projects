@@ -466,9 +466,38 @@ class SQL:
                 raise ValueError("User_id does not exist in the database")
             if user_spent < 0:
                 raise ValueError("user_spent cannot be less than 0")
-            query = f"UPDATE user SET user_spent = user_spent + 1 WHERE user_id = {user_id}"
+            query = f"UPDATE user SET user_spent = user_spent + {user_spent} WHERE user_id = {user_id}"
             self.cursor.execute(query)
             self.conn.commit()
             print(f"{user_id}: user_spent updated")
+        except Exception as e:
+            print(e)
+
+
+    def user_add_active_time(self, user_id, amount_time):
+        try:
+            if not self.fromTable_id_exists('user', user_id):
+                raise ValueError("User_id does not exist in the database")
+            if amount_time < 0:
+                raise ValueError("amount_time cannot be less than 0")
+            query = f"UPDATE user SET user_total_active_time = user_total_active_time + {amount_time} WHERE user_id = {user_id}"
+            self.cursor.execute(query)
+            self.conn.commit()
+            print(f"{user_id}: user_total_active_time updated")
+        except Exception as e:
+            print(e)
+
+    
+    def product_add_event_type(self, product_id, event_type_name):
+        try:
+            if not self.fromTable_id_exists('product', product_id):
+                raise ValueError("product_id does not exist in the database")
+            if not self.fromTable_name_exists('event_type', event_type_name):
+                raise ValueError("event_type_name does not exist in the database")
+
+            query = f"UPDATE product SET product_{event_type_name} = product_{event_type_name} WHERE product_id = {product_id}"
+            self.cursor.execute(query)
+            self.conn.commit()
+            print(f"{product_id} {event_type_name} updated")
         except Exception as e:
             print(e)

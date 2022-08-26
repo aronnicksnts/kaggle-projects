@@ -49,7 +49,6 @@ modify_product(product_id, data)
 =================================
 add_user_activity(user_id, **data)
 
-
 get_user_session_between_date_exists(user_id, start_date, end_date) - boolean
 get_user_session_between_date(user_id, start_date, end_date) - return tuple of user_sessions_id
 
