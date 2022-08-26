@@ -414,21 +414,46 @@ class SQL:
             print(e)
 
 
-    def getUserSession_between_date_exists(self, user_id, start_date, end_date) -> bool:
+    def add_user_activity(self, user_id: int, event_type: str, product_id: int, user_session_id: str,
+    event_time: datetime.datetime, category_id:int = None):
         try:
-            pass
-        except Exception as e:
-            print(e)
+            if not self.fromTable_id_exists('user', user_id):
+                raise ValueError("User does not exist in the database")
+            if not self.fromTable_name_exists("event_type", event_type):
+                raise ValueError("event_type does not exist")
+            if not self.fromTable_id_exists("product", product_id):
+                raise ValueError("product_id does not exist in the database")
+            if not self.user_session_id_exists(user_session_id):
+                raise ValueError("user_session_id does not exist")
+            if category_id and not self.fromTable_id_exists(category_id):
+                raise ValueError("category_id does not exist in the database")
+            
+            user_activity_id = self.generate_random_id()
+            event_type_id = self.getId_from_name('event_type', event_type)
+            if category_id: 
+                query = "INSERT INTO user_activity (user_activity_id, event_time, event_type_id, product_id, category_id, " \
+                    "user_id, user_session_id) VALUES " \
+                        f"({user_activity_id}, {event_time}, {event_type_id}, {product_id}, {category_id}, {user_id}, {user_session_id})"
+            else:
+                query = "INSERT INTO user_activity (user_activity_id, event_time, event_type_id, product_id, " \
+                    "user_id, user_session_id) VALUES " \
+                        f"({user_activity_id}, {event_time}, {event_type_id}, {product_id}, {user_id}, {user_session_id})"
 
-    
-    def add_user_activity(self, user_id, **data):
-        try:
-            pass
+            self.cursor.execute(query)
+            self.conn.commit()
+            print("user_activity added to the database")
         except Exception as e:
             print(e)
 
     
     def modify_user_activity(self, user_id, **data):
+        try:
+            pass
+        except Exception as e:
+            print(e)
+
+
+    def getUserSession_between_date_exists(self, user_id, start_date, end_date) -> bool:
         try:
             pass
         except Exception as e:

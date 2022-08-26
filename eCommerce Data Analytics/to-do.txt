@@ -46,12 +46,12 @@ modify_user_session(user_session_id, data)
 
 add_product(product_id, data)
 modify_product(product_id, data)
-
+=================================
 add_user_activity(user_id, **data)
-modify_user_activity(user_activity_id, data)
+
 
 get_user_session_between_date_exists(user_id, start_date, end_date) - boolean
-get_user_session_between_date(user_id, start_date, end_date)
+get_user_session_between_date(user_id, start_date, end_date) - return tuple of user_sessions_id
 
 get_all_user_activity(user_id) - return all rows of user_activity of user
 get_user_activity_between(user_id, startTime, endTime) - get user activity between timeframe
@@ -72,3 +72,7 @@ user_add_active_time(user_id, amount_time) - Once a user session ends add total 
 parse_category(category)
 get_children_category(category_id)
 get_parent_category(category_id)
+
+
+l8r to do:
+modify_user_activity(user_activity_id, data)
