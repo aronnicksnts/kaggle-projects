@@ -163,20 +163,20 @@ class SQL:
 
     def add_category(self, category_name: str, category_parent: str =  'ee7c9258-924f-49d3-b4c8-446541f00dc9'):
         try: 
-            if category_name == None:
-                raise ValueError("No category name found")
-            elif type(category_name) != str:
-                raise TypeError("category_name is not a string")
-            elif type(category_parent) != str:
-                raise TypeError("category_parent is not an string")
-            elif self.fromTable_name_exists('category', category_name):
-                raise "Category name already exists"
+            # if category_name == None:
+            #     raise ValueError("No category name found")
+            # elif type(category_name) != str:
+            #     raise TypeError("category_name is not a string")
+            # elif type(category_parent) != str:
+            #     raise TypeError("category_parent is not an string")
+            # elif self.fromTable_name_exists('category', category_name):
+            #     raise "Category name already exists"
+
             category_id = self.generate_random_id()
             query = "INSERT INTO CATEGORY (category_id, category_parent, category_name) VALUES " \
             f"('{category_id}', '{category_parent}', '{category_name}');"
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"Successfully added {category_name} into category")
         except Exception as e:
             print(e)
 
@@ -200,23 +200,20 @@ class SQL:
             query = self.combine_query('category', category_id, data)
             self.cursor.execute(query)
             self.conn.commit()
-
-            print("Sucessfully modified category")
         except Exception as e:
             print(e)
 
 
     def add_user(self, user_id, user_name = None):
         try:
-            if self.fromTable_id_exists("user", user_id):
-                raise NameError("user_id already exists")
-            if user_id == None:
-                raise ValueError("No value for user_id found")
+            # if self.fromTable_id_exists("user", user_id):
+            #     raise NameError("user_id already exists")
+            # if user_id == None:
+            #     raise ValueError("No value for user_id found")
             
             query = f"INSERT INTO user (user_id, user_name) VALUES ({user_id}, '{user_name}')"
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"Successfully added User {user_id}")
         except Exception as e:
             print(e)
 
@@ -224,76 +221,71 @@ class SQL:
     #Only accepts user_name, user_active, user_spent, user_total_active_time
     def modify_user(self, user_id, **data):
         try:
-            if not self.fromTable_id_exists("user", user_id):
-                raise NameError(f'user_id {user_id} does not exist in the database')
-            for key in data.keys():
-                if key not in ['user_name', 'user_active', 'user_spent', 'user_total_active_time']:
-                    raise NameError(f"{key} is not an acceptable variable for modify user")
-            if 'user_name' in data.keys() and not type(data['user_name']) == str:
-                raise TypeError("user_name is not a string")
-            if 'user_active' in data.keys() and not type(data['user_active']) == bool:
-                raise TypeError("user_active is not a boolean")
-            if 'user_spent' in data.keys() and not type(data['user_spent']) == float:
-                raise TypeError("user_spent is not a float/double")
-            if 'user_total_active_time' in data.keys() and not type(data['user_total_active_time']) == int:
-                raise TypeError("user_total_active_time is not an integer")
+            # if not self.fromTable_id_exists("user", user_id):
+            #     raise NameError(f'user_id {user_id} does not exist in the database')
+            # for key in data.keys():
+            #     if key not in ['user_name', 'user_active', 'user_spent', 'user_total_active_time']:
+            #         raise NameError(f"{key} is not an acceptable variable for modify user")
+            # if 'user_name' in data.keys() and not type(data['user_name']) == str:
+            #     raise TypeError("user_name is not a string")
+            # if 'user_active' in data.keys() and not type(data['user_active']) == bool:
+            #     raise TypeError("user_active is not a boolean")
+            # if 'user_spent' in data.keys() and not type(data['user_spent']) == float:
+            #     raise TypeError("user_spent is not a float/double")
+            # if 'user_total_active_time' in data.keys() and not type(data['user_total_active_time']) == int:
+            #     raise TypeError("user_total_active_time is not an integer")
             
             query = self.combine_query_user('user', user_id, data)
             self.cursor.execute(query)
             self.conn.commit()
-
-            print("Successfully Modified User")
         except Exception as e:
             print(e)
 
 
     def add_brand(self, brand_name):
         try:
-            if self.fromTable_name_exists("brand", brand_name):
-                raise NameError("brand_name already exists")
-            if brand_name == None:
-                raise ValueError("No value for brand_name found")
+            # if self.fromTable_name_exists("brand", brand_name):
+            #     raise NameError("brand_name already exists")
+            # if brand_name == None:
+            #     raise ValueError("No value for brand_name found")
             
             brand_id = self.generate_random_id()
             query = f"INSERT INTO brand (brand_id, brand_name) VALUES ('{brand_id}', '{brand_name}');"
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"Successfully added brand {brand_name}")
         except Exception as e:
             print(e)
 
 
     def modify_brand(self, brand_id, **data):
         try:
-            if not self.fromTable_id_exists("brand", brand_id):
-                raise ValueError("brand_id does not exist")
-            for key in data.keys():
-                if key not in ['brand_name', 'brand_active']:
-                    raise NameError(f"{key} is not an acceptable variable for modify brand")
-            if 'brand_name' in data.keys() and not type(data['brand_name']) == str:
-                raise TypeError("brand_name is not a string")
-            if 'brand_active' in data.keys() and not type(data['brand_active']) == bool:
-                raise TypeError("brand_active should be boolean")
+            # if not self.fromTable_id_exists("brand", brand_id):
+            #     raise ValueError("brand_id does not exist")
+            # for key in data.keys():
+            #     if key not in ['brand_name', 'brand_active']:
+            #         raise NameError(f"{key} is not an acceptable variable for modify brand")
+            # if 'brand_name' in data.keys() and not type(data['brand_name']) == str:
+            #     raise TypeError("brand_name is not a string")
+            # if 'brand_active' in data.keys() and not type(data['brand_active']) == bool:
+            #     raise TypeError("brand_active should be boolean")
             query = self.combine_query('brand', brand_id, data)
             self.cursor.execute(query)
             self.conn.commit()
-            print("Modified brand successfully")
         except Exception as e:
             print(e)
     
 
     def add_event_type(self, event_type_name):
         try:
-            if self.fromTable_name_exists("event_type", event_type_name):
-                raise NameError("event_type_name already exists")
-            if event_type_name == None:
-                raise ValueError("No value for event_type_name found")
+            # if self.fromTable_name_exists("event_type", event_type_name):
+            #     raise NameError("event_type_name already exists")
+            # if event_type_name == None:
+            #     raise ValueError("No value for event_type_name found")
             
             event_type_id = self.generate_random_id()
             query = f"INSERT INTO event_type (event_type_id, event_type_name) VALUES ('{event_type_id}', '{event_type_name}');"
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"Successfully added event_type {event_type_name}")
         except Exception as e:
             print(e)
 
@@ -308,7 +300,6 @@ class SQL:
             query = f"UPDATE event_type SET event_type_name = '{event_type_name}' WHERE event_type_id = '{event_type_id}'"
             self.cursor.execute(query)
             self.conn.commit()
-            print("Modified event_type successfully")
 
         except Exception as e:
             print(e)
@@ -318,20 +309,19 @@ class SQL:
         try:
             user_session_datetime = self.convert_str_datetime(user_session_datetime)
 
-            if self.user_session_id_exists(user_session_id):
-                raise ValueError("user_session_id already exists in the database")
-            if not uuid.UUID(str(user_session_id), version=4):
-                raise TypeError("user_session_id is not an id or a valid id")
-            if not self.fromTable_id_exists("user", user_id):
-                raise ValueError("user_id does not exist in the database")
-            if not isinstance(user_session_datetime, datetime.datetime):
-                raise TypeError("user_session_datetime is not a datetime")
+            # if self.user_session_id_exists(user_session_id):
+            #     raise ValueError("user_session_id already exists in the database")
+            # if not uuid.UUID(str(user_session_id), version=4):
+            #     raise TypeError("user_session_id is not an id or a valid id")
+            # if not self.fromTable_id_exists("user", user_id):
+            #     raise ValueError("user_id does not exist in the database")
+            # if not isinstance(user_session_datetime, datetime.datetime):
+            #     raise TypeError("user_session_datetime is not a datetime")
         
             query = "INSERT INTO user_session (user_session_id, user_id, user_session_start_time, " \
             f"user_session_end_time) VALUES ('{user_session_id}', {user_id}, '{user_session_datetime}', '{user_session_datetime}')"
             self.cursor.execute(query)
             self.conn.commit()
-            print("Added user_session successfully")
         except Exception as e:
             print(e)
 
@@ -359,7 +349,6 @@ class SQL:
             query = self.combine_query('user_session', user_session_id, data)
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"{user_session_id} user_session successfully modified")
         except Exception as e:
             print(e)
 
@@ -370,8 +359,8 @@ class SQL:
                 raise NameError(f"{product_id} already exists in the database")
             if brand_id and not self.fromTable_id_exists('brand', brand_id):
                 raise ValueError(f"{brand_id} brand_id does not exist in the database")
-            if product_price <= 0:
-                raise ValueError("product_price cannot be lower than or equal to 0")
+            if product_price < 0:
+                raise ValueError("product_price cannot be lower than 0")
             if product_price is None:
                 raise ValueError("product needs to have a price")
 
@@ -383,7 +372,6 @@ class SQL:
                     f"('{product_id}', {product_price})"
             self.cursor.execute(query)
             self.conn.commit()
-            print("Added product successfully")
         except Exception as e:
             print(e)
 
@@ -431,7 +419,6 @@ class SQL:
             query = self.combine_query('product', product_id, data)
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"Product {product_id} successfully modified")
         except Exception as e:
             print(e)
 
@@ -439,16 +426,16 @@ class SQL:
     def add_user_activity(self, user_id: int, event_type: str, product_id: int, user_session_id: str,
     event_time: datetime.datetime, category_id:int = None):
         try:
-            if not self.fromTable_id_exists('user', user_id):
-                raise ValueError("User does not exist in the database")
-            if not self.fromTable_name_exists("event_type", event_type):
-                raise ValueError("event_type does not exist")
-            if not self.fromTable_id_exists("product", product_id):
-                raise ValueError("product_id does not exist in the database")
-            if not self.user_session_id_exists(user_session_id):
-                raise ValueError("user_session_id does not exist")
-            if category_id and not self.fromTable_id_exists('category',category_id):
-                raise ValueError("category_id does not exist in the database")
+            # if not self.fromTable_id_exists('user', user_id):
+            #     raise ValueError("User does not exist in the database")
+            # if not self.fromTable_name_exists("event_type", event_type):
+            #     raise ValueError("event_type does not exist")
+            # if not self.fromTable_id_exists("product", product_id):
+            #     raise ValueError("product_id does not exist in the database")
+            # if not self.user_session_id_exists(user_session_id):
+            #     raise ValueError("user_session_id does not exist")
+            # if category_id and not self.fromTable_id_exists('category',category_id):
+            #     raise ValueError("category_id does not exist in the database")
             
             user_activity_id = self.generate_random_id()
             event_type_id = self.getId_from_name('event_type', event_type)
@@ -463,7 +450,6 @@ class SQL:
 
             self.cursor.execute(query)
             self.conn.commit()
-            print("user_activity added to the database")
         except Exception as e:
             print(e)
 
@@ -484,38 +470,36 @@ class SQL:
     
     def user_add_purchase(self, user_id, user_spent):
         try:
-            if not self.fromTable_id_exists('user', user_id):
-                raise ValueError("User_id does not exist in the database")
-            if user_spent < 0:
-                raise ValueError("user_spent cannot be less than 0")
+            # if not self.fromTable_id_exists('user', user_id):
+            #     raise ValueError("User_id does not exist in the database")
+            # if user_spent < 0:
+            #     raise ValueError("user_spent cannot be less than 0")
             query = f"UPDATE user SET user_spent = user_spent + {user_spent} WHERE user_id = {user_id}"
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"{user_id}: user_spent updated")
         except Exception as e:
             print(e)
 
 
     def user_add_active_time(self, user_id, amount_time):
         try:
-            if not self.fromTable_id_exists('user', user_id):
-                raise ValueError("User_id does not exist in the database")
-            if amount_time < 0:
-                raise ValueError("amount_time cannot be less than 0")
+            # if not self.fromTable_id_exists('user', user_id):
+            #     raise ValueError("User_id does not exist in the database")
+            # if amount_time < 0:
+            #     raise ValueError("amount_time cannot be less than 0")
             query = f"UPDATE user SET user_total_active_time = user_total_active_time + {amount_time} WHERE user_id = {user_id}"
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"{user_id}: user_total_active_time updated")
         except Exception as e:
             print(e)
 
     
     def product_add_event_type(self, product_id, event_type_name):
         try:
-            if not self.fromTable_id_exists('product', product_id):
-                raise ValueError("product_id does not exist in the database")
-            if not self.fromTable_name_exists('event_type', event_type_name):
-                raise ValueError("event_type_name does not exist in the database")
+            # if not self.fromTable_id_exists('product', product_id):
+            #     raise ValueError("product_id does not exist in the database")
+            # if not self.fromTable_name_exists('event_type', event_type_name):
+            #     raise ValueError("event_type_name does not exist in the database")
 
             if event_type_name == "view":
                 event_type_name = "viewed"
@@ -529,7 +513,6 @@ class SQL:
             query = f"UPDATE product SET product_{event_type_name} = product_{event_type_name}+1 WHERE product_id = {product_id}"
             self.cursor.execute(query)
             self.conn.commit()
-            print(f"{product_id} {event_type_name} updated")
         except Exception as e:
             print(e)
 
