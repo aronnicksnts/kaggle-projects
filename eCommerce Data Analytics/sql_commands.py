@@ -36,7 +36,7 @@ class SQL:
 
     @staticmethod
     def generate_random_number():
-        return uuid.uuid1().int>>64
+        return int(uuid.uuid4())
 
 
     @staticmethod
@@ -52,6 +52,17 @@ class SQL:
                 query += f"{key} = {value}, "
             else:
                 query += f"{key} = '{value}', "
+        query = query[:-2] + f" WHERE {table_name}_id = '{id}'"
+        return query
+
+    @staticmethod
+    def combine_query_user(table_name, id, data):
+        query = f"UPDATE {table_name} SET "
+        for (key, value) in data.items():
+            if type(value) == int:
+                query += f"{key} = {value}, "
+            else:
+                query += f"{key} = '{value}', "
         query = query[:-2] + f" WHERE {table_name}_id = {id}"
         return query
 
@@ -61,7 +72,7 @@ class SQL:
             if not self.fromTable_id_exists(table_name, id):
                 raise NameError(f"{table_name}_id {id} does not exist in the database")
             
-            query = f"UPDATE {table_name} SET '{table_name}_active' = 0 WHERE {table_name}_id = {id}"
+            query = f"UPDATE {table_name} SET '{table_name}_active' = 0 WHERE {table_name}_id = '{id}'"
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -72,7 +83,9 @@ class SQL:
         try:
             query = f"SELECT EXISTS (SELECT * FROM {table_name} WHERE {table_name}_name = '{name}')"
             self.cursor.execute(query)
-            return self.cursor.fetchall()[0][0]
+            if self.cursor.fetchone()[0] == 0:
+                return False
+            return True
             
 
         except Exception as e:
@@ -80,7 +93,7 @@ class SQL:
     
 
     def fromTable_id_exists(self, table_name, id) -> bool:
-        query = f"SELECT EXISTS (SELECT * FROM {table_name} WHERE {table_name}_id = {id})"
+        query = f"SELECT EXISTS (SELECT * FROM {table_name} WHERE {table_name}_id = '{id}')"
         self.cursor.execute(query)
         if self.cursor.fetchone()[0] == 0:
             return False
@@ -89,7 +102,7 @@ class SQL:
 
     def getTable_from_id(self, table_name, id):
         try:
-            query = f"SELECT * FROM {table_name} WHERE {table_name}_id = {id}"
+            query = f"SELECT * FROM {table_name} WHERE {table_name}_id = '{id}'"
             self.cursor.execute(query)
             table = self.cursor.fetchone()
             if table is None:
@@ -130,24 +143,37 @@ class SQL:
             return False
         return True
 
+
+    def getTable_user_session(self, user_session_id):
+        try:
+            query = f"SELECT * FROM user_session WHERE user_session_id = '{user_session_id}'"
+            self.cursor.execute(query)
+            table = self.cursor.fetchone()
+            if table is None:
+                return tuple()
+            return table
+        except Exception as e:
+            print(e)
+
+
     @staticmethod
     def convert_str_datetime(string_datetime):
         return datetime.datetime.strptime(string_datetime[:-4], '%Y-%m-%d %H:%M:%S')
 
 
-    def add_category(self, category_name: str, category_parent: int =  0):
+    def add_category(self, category_name: str, category_parent: str =  'ee7c9258-924f-49d3-b4c8-446541f00dc9'):
         try: 
             if category_name == None:
                 raise ValueError("No category name found")
             elif type(category_name) != str:
                 raise TypeError("category_name is not a string")
-            elif type(category_parent) != int:
-                raise TypeError("category_parent is not an integer")
+            elif type(category_parent) != str:
+                raise TypeError("category_parent is not an string")
             elif self.fromTable_name_exists('category', category_name):
                 raise "Category name already exists"
-            category_id = self.generate_random_number()
+            category_id = self.generate_random_id()
             query = "INSERT INTO CATEGORY (category_id, category_parent, category_name) VALUES " \
-            f"({category_id}, {category_parent}, '{category_name}');"
+            f"('{category_id}', '{category_parent}', '{category_name}');"
             self.cursor.execute(query)
             self.conn.commit()
             print(f"Successfully added {category_name} into category")
@@ -164,7 +190,7 @@ class SQL:
             for key in data.keys():
                 if key not in ['category_name', 'category_parent', 'category_active']:
                     raise NameError(f"{key} is not an acceptable variable for modify category")
-            if 'category_parent' in data.keys() and not type(data['category_parent']) == int:
+            if 'category_parent' in data.keys() and not type(data['category_parent']) == str:
                 raise TypeError("category_parent is should be an integer")
             if 'category_active' in data.keys() and not type(data['category_active']) == int:
                 raise TypeError("category_active is should be an integer")
@@ -212,7 +238,7 @@ class SQL:
             if 'user_total_active_time' in data.keys() and not type(data['user_total_active_time']) == int:
                 raise TypeError("user_total_active_time is not an integer")
             
-            query = self.combine_query('user', user_id, data)
+            query = self.combine_query_user('user', user_id, data)
             self.cursor.execute(query)
             self.conn.commit()
 
@@ -228,9 +254,8 @@ class SQL:
             if brand_name == None:
                 raise ValueError("No value for brand_name found")
             
-            brand_id = self.generate_random_number()
-            query = f"INSERT INTO brand (brand_id, brand_name) VALUES ({brand_id}, '{brand_name}');"
-            print(query)
+            brand_id = self.generate_random_id()
+            query = f"INSERT INTO brand (brand_id, brand_name) VALUES ('{brand_id}', '{brand_name}');"
             self.cursor.execute(query)
             self.conn.commit()
             print(f"Successfully added brand {brand_name}")
@@ -264,9 +289,8 @@ class SQL:
             if event_type_name == None:
                 raise ValueError("No value for event_type_name found")
             
-            event_type_id = self.generate_random_number()
-            query = f"INSERT INTO event_type (event_type_id, event_type_name) VALUES ({event_type_id}, '{event_type_name}');"
-            print(query)
+            event_type_id = self.generate_random_id()
+            query = f"INSERT INTO event_type (event_type_id, event_type_name) VALUES ('{event_type_id}', '{event_type_name}');"
             self.cursor.execute(query)
             self.conn.commit()
             print(f"Successfully added event_type {event_type_name}")
@@ -281,7 +305,7 @@ class SQL:
             if not type(event_type_name) == str:
                 raise TypeError("event_type_name is not a string")
 
-            query = f"UPDATE event_type SET event_type_name = '{event_type_name}' WHERE event_type_id = {event_type_id}"
+            query = f"UPDATE event_type SET event_type_name = '{event_type_name}' WHERE event_type_id = '{event_type_id}'"
             self.cursor.execute(query)
             self.conn.commit()
             print("Modified event_type successfully")
@@ -332,7 +356,7 @@ class SQL:
             if 'user_session_active' in data.keys() and not type(data['user_session_active']) == bool:
                 raise TypeError("user_session_active is not a boolean")
 
-            query = self.combine_query('user_session', f"'{user_session_id}'", data)
+            query = self.combine_query('user_session', user_session_id, data)
             self.cursor.execute(query)
             self.conn.commit()
             print(f"{user_session_id} user_session successfully modified")
@@ -340,12 +364,10 @@ class SQL:
             print(e)
 
 
-    def add_product(self, product_id: int, product_price: float, brand_id: int = None):
+    def add_product(self, product_id: str, product_price: float, brand_id: int = None):
         try:
             if self.fromTable_id_exists('product', product_id):
                 raise NameError(f"{product_id} already exists in the database")
-            if type(product_id) != int:
-                raise TypeError("product_name should be a string")
             if brand_id and not self.fromTable_id_exists('brand', brand_id):
                 raise ValueError(f"{brand_id} brand_id does not exist in the database")
             if product_price <= 0:
@@ -355,10 +377,10 @@ class SQL:
 
             if brand_id:
                 query = "INSERT INTO product (product_id, product_price, brand_id) VALUES " \
-                    f"({product_id}, {product_price}, {brand_id})"
+                    f"('{product_id}', {product_price}, '{brand_id}')"
             else:
                 query = "INSERT INTO product (product_id, product_price) VALUES " \
-                    f"({product_id}, {product_price})"
+                    f"('{product_id}', {product_price})"
             self.cursor.execute(query)
             self.conn.commit()
             print("Added product successfully")
@@ -381,8 +403,8 @@ class SQL:
             if 'brand_id' in data.keys():
                 if not self.fromTable_id_exists('brand', data['brand_id']):
                     raise ValueError(f"The brand_id {data['brand_id']} does not exist in the database")
-                if type(data['brand_id']) != int:
-                    raise TypeError("brand_id is not an integer")
+                if type(data['brand_id']) != str:
+                    raise TypeError("brand_id is not an string")
             if 'product_active' in data.keys() and type(data['product_active']) != bool:
                 raise TypeError("product_active is not a boolean")
             if 'product_viewed' in data.keys():
@@ -425,7 +447,7 @@ class SQL:
                 raise ValueError("product_id does not exist in the database")
             if not self.user_session_id_exists(user_session_id):
                 raise ValueError("user_session_id does not exist")
-            if category_id and not self.fromTable_id_exists(category_id):
+            if category_id and not self.fromTable_id_exists('category',category_id):
                 raise ValueError("category_id does not exist in the database")
             
             user_activity_id = self.generate_random_id()
@@ -433,11 +455,11 @@ class SQL:
             if category_id: 
                 query = "INSERT INTO user_activity (user_activity_id, event_time, event_type_id, product_id, category_id, " \
                     "user_id, user_session_id) VALUES " \
-                        f"({user_activity_id}, {event_time}, {event_type_id}, {product_id}, {category_id}, {user_id}, {user_session_id})"
+                        f"('{user_activity_id}', '{self.convert_str_datetime(event_time)}', '{event_type_id}', '{product_id}', '{category_id}', {user_id}, '{user_session_id}')"
             else:
                 query = "INSERT INTO user_activity (user_activity_id, event_time, event_type_id, product_id, " \
                     "user_id, user_session_id) VALUES " \
-                        f"({user_activity_id}, {event_time}, {event_type_id}, {product_id}, {user_id}, {user_session_id})"
+                        f"('{user_activity_id}', '{self.convert_str_datetime(event_time)}', '{event_type_id}', '{product_id}', {user_id}, '{user_session_id}')"
 
             self.cursor.execute(query)
             self.conn.commit()
@@ -495,9 +517,26 @@ class SQL:
             if not self.fromTable_name_exists('event_type', event_type_name):
                 raise ValueError("event_type_name does not exist in the database")
 
-            query = f"UPDATE product SET product_{event_type_name} = product_{event_type_name} WHERE product_id = {product_id}"
+            if event_type_name == "view":
+                event_type_name = "viewed"
+            elif event_type_name == "cart":
+                event_type_name = "added_cart"
+            elif event_type_name == "remove_from_cart":
+                event_type_name = "removed_cart"
+            else:
+                event_type_name = "purchased"
+
+            query = f"UPDATE product SET product_{event_type_name} = product_{event_type_name}+1 WHERE product_id = {product_id}"
             self.cursor.execute(query)
             self.conn.commit()
             print(f"{product_id} {event_type_name} updated")
+        except Exception as e:
+            print(e)
+
+    @staticmethod
+    def parse_category(category: str):
+        try:
+            categories = category.split('.')
+            return categories
         except Exception as e:
             print(e)

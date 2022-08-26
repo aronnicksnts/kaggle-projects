@@ -1,26 +1,26 @@
 CREATE TABLE `category` (
-  `category_id` bigint PRIMARY KEY NOT NULL,
-  `category_parent` bigint,
+  `category_id` char(36) PRIMARY KEY NOT NULL,
+  `category_parent` char(36),
   `category_name` varchar(30) UNIQUE,
   `category_active` boolean DEFAULT true
 );
 
 CREATE TABLE `brand` (
-  `brand_id` bigint PRIMARY KEY NOT NULL,
+  `brand_id` char(36) PRIMARY KEY NOT NULL,
   `brand_name` varchar(30) UNIQUE,
   `brand_active` boolean DEFAULT true
 );
 
 CREATE TABLE `event_type` (
-  `event_type_id` bigint PRIMARY KEY NOT NULL,
+  `event_type_id` char(36) PRIMARY KEY NOT NULL,
   `event_type_name` varchar(16)
 );
 
 CREATE TABLE `product` (
-  `product_id` bigint PRIMARY KEY NOT NULL,
+  `product_id` char(36) PRIMARY KEY NOT NULL,
   `product_name` varchar(255),
   `product_price` double NOT NULL,
-  `brand_id` bigint,
+  `brand_id` char(36),
   `product_active` boolean DEFAULT true,
   `product_viewed` int DEFAULT 0,
   `product_added_cart` int DEFAULT 0,
@@ -47,9 +47,9 @@ CREATE TABLE `user_session` (
 CREATE TABLE `user_activity` (
   `user_activity_id` char(36) PRIMARY KEY NOT NULL,
   `event_time` datetime,
-  `event_type_id` bigint NOT NULL,
-  `product_id` bigint NOT NULL,
-  `category_id` bigint,
+  `event_type_id` char(36) NOT NULL,
+  `product_id` char(36) NOT NULL,
+  `category_id` char(36),
   `user_id` bigint NOT NULL,
   `user_session_id` char(36) NOT NULL,
   `user_activity_active` boolean DEFAULT true
