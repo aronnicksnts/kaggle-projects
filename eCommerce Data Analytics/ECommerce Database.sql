@@ -21,11 +21,7 @@ CREATE TABLE `product` (
   `product_name` varchar(255),
   `product_price` double NOT NULL,
   `brand_id` bigint,
-  `product_active` boolean DEFAULT true,
-  `product_viewed` int DEFAULT 0,
-  `product_added_cart` int DEFAULT 0,
-  `product_removed_cart` int DEFAULT 0,
-  `product_purchased` int DEFAULT 0
+  `product_active` boolean DEFAULT true
 );
 
 CREATE TABLE `user` (
@@ -55,6 +51,30 @@ CREATE TABLE `user_activity` (
   `user_activity_active` boolean DEFAULT true
 );
 
+CREATE TABLE `product_purchase` (
+  `product_purchase_id` bigint PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `product_id` bigint,
+  `user_id` bigint
+);
+
+CREATE TABLE `product_view` (
+  `product_view_id` bigint PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `product_id` bigint,
+  `user_id` bigint
+);
+
+CREATE TABLE `product_add_cart` (
+  `product_add_cart_id` bigint PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `product_id` bigint,
+  `user_id` bigint
+);
+
+CREATE TABLE `product_remove_cart` (
+  `product_remove_cart_id` bigint PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `product_id` bigint,
+  `user_id` bigint
+);
+
 ALTER TABLE `category` ADD FOREIGN KEY (`category_parent`) REFERENCES `category` (`category_id`);
 
 ALTER TABLE `product` ADD FOREIGN KEY (`brand_id`) REFERENCES `brand` (`brand_id`);
@@ -70,3 +90,19 @@ ALTER TABLE `user_activity` ADD FOREIGN KEY (`category_id`) REFERENCES `category
 ALTER TABLE `user_activity` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 ALTER TABLE `user_activity` ADD FOREIGN KEY (`user_session_id`) REFERENCES `user_session` (`user_session_id`);
+
+ALTER TABLE `product_purchase` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_purchase` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+ALTER TABLE `product_view` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_view` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+ALTER TABLE `product_add_cart` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_add_cart` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+ALTER TABLE `product_remove_cart` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_remove_cart` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);

@@ -26,8 +26,8 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
         user_session_id = row['user_session']
 
         #Does event_type exist
-        if not mySQL.fromTable_name_exists('event_type', event_type):
-            mySQL.add_event_type(event_type)
+        # if not mySQL.fromTable_name_exists('event_type', event_type):
+        #     mySQL.add_event_type(event_type)
         #Does brand exist
         if brand and not mySQL.fromTable_name_exists('brand', brand):
             mySQL.add_brand(brand)
@@ -56,25 +56,26 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
         except Exception as e:
             print(e)
             continue
-        #Does user_id exist
-        if not mySQL.fromTable_id_exists('user', user_id):
-            mySQL.add_user(user_id)
+        #Does user_id exist if not, add user
+        mySQL.add_user(user_id)
         #Does user_session exist
         if not mySQL.user_session_id_exists(user_session_id):
             mySQL.add_user_session(user_session_id,user_id, event_time)
         #Is user_session_start_time lower than current
-        if mySQL.convert_str_datetime(event_time) < mySQL.getTable_user_session(user_session_id)[2]:
+        current_user_session = mySQL.getTable_user_session(user_session_id)
+        if mySQL.convert_str_datetime(event_time) < current_user_session[2]:
             data = {"user_session_start_time": event_time}
             mySQL.modify_user_session(user_session_id, **data)
         #Is user_session_end_time higher than current
-        if mySQL.convert_str_datetime(event_time) > mySQL.getTable_user_session(user_session_id)[3]:
+        if mySQL.convert_str_datetime(event_time) > current_user_session[3]:
             data = {"user_session_end_time": event_time}
             mySQL.modify_user_session(user_session_id, **data)
         
         #INCREMENT PRODUCT_VIEW/ADDED_CART/PURCHASE
-        mySQL.product_add_event_type(product_id, event_type)
+        mySQL.product_add_event_type(product_id, event_type, user_id)
+        
         #Add the user_activity
-        if category_parent != 'ee7c9258-924f-49d3-b4c8-446541f00dc9':
+        if category_parent != 1:
             mySQL.add_user_activity(user_id, event_type, product_id, user_session_id, event_time, current_category_id)
         else:
             mySQL.add_user_activity(user_id, event_type, product_id, user_session_id, event_time)

@@ -209,7 +209,7 @@ class SQL:
             # if user_id == None:
             #     raise ValueError("No value for user_id found")
             
-            query = f"INSERT INTO user (user_id, user_name) VALUES ({user_id}, '{user_name}')"
+            query = f"INSERT IGNORE INTO user (user_id, user_name) VALUES ({user_id}, '{user_name}')"
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -233,7 +233,7 @@ class SQL:
             # if 'user_total_active_time' in data.keys() and not type(data['user_total_active_time']) == int:
             #     raise TypeError("user_total_active_time is not an integer")
             
-            query = self.combine_query_user('user', user_id, data)
+            query = self.combine_query('user', user_id, data)
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -377,8 +377,7 @@ class SQL:
             if not self.fromTable_id_exists('product', product_id):
                 raise ValueError("product_id does not exist in the database")
             for key in data.keys():
-                if key not in ['product_name', 'product_price', 'brand_id', 'product_active',
-                'product_viewed', 'product_added_cart', 'product_removed_cart', 'product_purchased']:
+                if key not in ['product_name', 'product_price', 'brand_id', 'product_active']:
                     raise NameError(f"{key} is not an acceptable variable for modifying product")
             if 'product_name' in data.keys() and (type(data['product_name']) != str or data["product_name"] == None):
                 raise TypeError("product_name is not a string")
@@ -391,27 +390,6 @@ class SQL:
                     raise TypeError("brand_id is not an string")
             if 'product_active' in data.keys() and type(data['product_active']) != bool:
                 raise TypeError("product_active is not a boolean")
-            if 'product_viewed' in data.keys():
-                if type(data['product_viewed']) != int:
-                    raise TypeError("product_viewed is not an integer")
-                if data['product_viewed'] < 0:
-                    raise ValueError("product_viewed cannot be less than 0")
-            if 'product_added_cart' in data.keys():
-                if type(data['product_added_cart']) != int:
-                    raise TypeError("product_added_cart is not an integer")
-                if data['product_added_cart'] < 0:
-                    raise ValueError("product_added_cart cannot be less than 0")
-            if 'product_removed_cart' in data.keys():
-                if type(data['product_removed_cart']) != int:
-                    raise TypeError("product_removed_cart is not an integer")
-                if data['product_removed_cart'] < 0:
-                    raise ValueError("product_removed_cart cannot be less than 0")
-            if 'product_purchased' in data.keys():
-                if type(data['product_purchased']) != int:
-                    raise TypeError("product_purchased is not an integer")
-                if data['product_purchased'] < 0:
-                    raise ValueError("product_purchased cannot be less than 0")
-            
             query = self.combine_query('product', product_id, data)
             self.cursor.execute(query)
             self.conn.commit()
@@ -432,8 +410,14 @@ class SQL:
             #     raise ValueError("user_session_id does not exist")
             # if category_id and not self.fromTable_id_exists('category',category_id):
             #     raise ValueError("category_id does not exist in the database")
-
-            event_type_id = self.getId_from_name('event_type', event_type)
+            if event_type == "view":
+                event_type_id = 1
+            elif event_type == "cart":
+                event_type_id = 2
+            elif event_type == "remove_from_cart":
+                event_type_id = 3
+            else:
+                event_type_id = 4
             if category_id: 
                 query = "INSERT INTO user_activity (event_time, event_type_id, product_id, category_id, " \
                     "user_id, user_session_id) VALUES " \
@@ -489,7 +473,7 @@ class SQL:
             print(e)
 
     
-    def product_add_event_type(self, product_id, event_type_name):
+    def product_add_event_type(self, product_id, event_type_name, user_id):
         try:
             # if not self.fromTable_id_exists('product', product_id):
             #     raise ValueError("product_id does not exist in the database")
@@ -497,15 +481,19 @@ class SQL:
             #     raise ValueError("event_type_name does not exist in the database")
 
             if event_type_name == "view":
-                event_type_name = "viewed"
+                event_type_name = "view"
             elif event_type_name == "cart":
-                event_type_name = "added_cart"
+                event_type_name = "add_cart"
             elif event_type_name == "remove_from_cart":
                 event_type_name = "removed_cart"
             else:
-                event_type_name = "purchased"
+                event_type_name = "purchase"
+                price = self.getTable_from_id('product', product_id)[2]
+                data = {"user_spent": price}
+                self.modify_user(user_id, **data)
 
-            query = f"UPDATE product SET product_{event_type_name} = product_{event_type_name}+1 WHERE product_id = {product_id}"
+
+            query = f"INSERT INTO product_{event_type_name} (product_id, user_id) VALUES ({product_id}, {user_id})"
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
