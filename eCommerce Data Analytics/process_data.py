@@ -39,14 +39,14 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
             else:
                 mySQL.add_product(product_id, price)
         #Does category_code exist
-        category_parent = 'ee7c9258-924f-49d3-b4c8-446541f00dc9'
+        category_parent = 1
         if type(category_code) == str:
             for category_name in mySQL.parse_category(category_code):
                 if not mySQL.fromTable_name_exists("category", category_name):
                     mySQL.add_category(category_name, category_parent)
-                category_parent = mySQL.getTable_from_name('category', category_name)[0]
+                category_parent = int(mySQL.getTable_from_name('category', category_name)[0])
 
-        if category_parent != 'ee7c9258-924f-49d3-b4c8-446541f00dc9':
+        if category_parent != 1:
             current_category_id = category_parent
 
         #Does price exist

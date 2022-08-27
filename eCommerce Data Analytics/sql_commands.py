@@ -52,18 +52,18 @@ class SQL:
                 query += f"{key} = {value}, "
             else:
                 query += f"{key} = '{value}', "
-        query = query[:-2] + f" WHERE {table_name}_id = '{id}'"
+        query = query[:-2] + f" WHERE {table_name}_id = {id}"
         return query
 
     @staticmethod
-    def combine_query_user(table_name, id, data):
+    def combine_query_strid(table_name, id, data):
         query = f"UPDATE {table_name} SET "
         for (key, value) in data.items():
             if type(value) == int:
                 query += f"{key} = {value}, "
             else:
                 query += f"{key} = '{value}', "
-        query = query[:-2] + f" WHERE {table_name}_id = {id}"
+        query = query[:-2] + f" WHERE {table_name}_id = '{id}'"
         return query
 
 
@@ -72,7 +72,7 @@ class SQL:
             if not self.fromTable_id_exists(table_name, id):
                 raise NameError(f"{table_name}_id {id} does not exist in the database")
             
-            query = f"UPDATE {table_name} SET '{table_name}_active' = 0 WHERE {table_name}_id = '{id}'"
+            query = f"UPDATE {table_name} SET '{table_name}_active' = 0 WHERE {table_name}_id = {id}"
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -93,7 +93,7 @@ class SQL:
     
 
     def fromTable_id_exists(self, table_name, id) -> bool:
-        query = f"SELECT EXISTS (SELECT * FROM {table_name} WHERE {table_name}_id = '{id}')"
+        query = f"SELECT EXISTS (SELECT * FROM {table_name} WHERE {table_name}_id = {id})"
         self.cursor.execute(query)
         if self.cursor.fetchone()[0] == 0:
             return False
@@ -102,7 +102,7 @@ class SQL:
 
     def getTable_from_id(self, table_name, id):
         try:
-            query = f"SELECT * FROM {table_name} WHERE {table_name}_id = '{id}'"
+            query = f"SELECT * FROM {table_name} WHERE {table_name}_id = {id}"
             self.cursor.execute(query)
             table = self.cursor.fetchone()
             if table is None:
@@ -171,10 +171,8 @@ class SQL:
             #     raise TypeError("category_parent is not an string")
             # elif self.fromTable_name_exists('category', category_name):
             #     raise "Category name already exists"
-
-            category_id = self.generate_random_id()
-            query = "INSERT INTO CATEGORY (category_id, category_parent, category_name) VALUES " \
-            f"('{category_id}', '{category_parent}', '{category_name}');"
+            query = "INSERT INTO CATEGORY (category_parent, category_name) VALUES " \
+            f"({category_parent}, '{category_name}');"
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -248,9 +246,8 @@ class SQL:
             #     raise NameError("brand_name already exists")
             # if brand_name == None:
             #     raise ValueError("No value for brand_name found")
-            
-            brand_id = self.generate_random_id()
-            query = f"INSERT INTO brand (brand_id, brand_name) VALUES ('{brand_id}', '{brand_name}');"
+
+            query = f"INSERT INTO brand (brand_name) VALUES ('{brand_name}');"
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -282,8 +279,7 @@ class SQL:
             # if event_type_name == None:
             #     raise ValueError("No value for event_type_name found")
             
-            event_type_id = self.generate_random_id()
-            query = f"INSERT INTO event_type (event_type_id, event_type_name) VALUES ('{event_type_id}', '{event_type_name}');"
+            query = f"INSERT INTO event_type (event_type_name) VALUES ('{event_type_name}');"
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -328,7 +324,7 @@ class SQL:
     
     def modify_user_session(self, user_session_id, **data):
         try:
-            if not self.fromTable_id_exists('user_session', user_session_id):
+            if not self.user_session_id_exists(user_session_id):
                 raise ValueError("user_session_id does not exist in the database")
             for key in data.keys():
                 if key not in ['user_id', 'user_session_start_time', 'user_session_end_time', 'user_session_active']:
@@ -346,7 +342,7 @@ class SQL:
             if 'user_session_active' in data.keys() and not type(data['user_session_active']) == bool:
                 raise TypeError("user_session_active is not a boolean")
 
-            query = self.combine_query('user_session', user_session_id, data)
+            query = self.combine_query_strid('user_session', user_session_id, data)
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as e:
@@ -436,17 +432,16 @@ class SQL:
             #     raise ValueError("user_session_id does not exist")
             # if category_id and not self.fromTable_id_exists('category',category_id):
             #     raise ValueError("category_id does not exist in the database")
-            
-            user_activity_id = self.generate_random_id()
+
             event_type_id = self.getId_from_name('event_type', event_type)
             if category_id: 
-                query = "INSERT INTO user_activity (user_activity_id, event_time, event_type_id, product_id, category_id, " \
+                query = "INSERT INTO user_activity (event_time, event_type_id, product_id, category_id, " \
                     "user_id, user_session_id) VALUES " \
-                        f"('{user_activity_id}', '{self.convert_str_datetime(event_time)}', '{event_type_id}', '{product_id}', '{category_id}', {user_id}, '{user_session_id}')"
+                        f"('{self.convert_str_datetime(event_time)}', {event_type_id}, {product_id}, {category_id}, {user_id}, '{user_session_id}')"
             else:
-                query = "INSERT INTO user_activity (user_activity_id, event_time, event_type_id, product_id, " \
+                query = "INSERT INTO user_activity (event_time, event_type_id, product_id, " \
                     "user_id, user_session_id) VALUES " \
-                        f"('{user_activity_id}', '{self.convert_str_datetime(event_time)}', '{event_type_id}', '{product_id}', {user_id}, '{user_session_id}')"
+                        f"('{self.convert_str_datetime(event_time)}', {event_type_id}, {product_id}, {user_id}, '{user_session_id}')"
 
             self.cursor.execute(query)
             self.conn.commit()
