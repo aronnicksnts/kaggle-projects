@@ -355,14 +355,14 @@ class SQL:
 
     def add_product(self, product_id: str, product_price: float, brand_id: int = None):
         try:
-            if self.fromTable_id_exists('product', product_id):
-                raise NameError(f"{product_id} already exists in the database")
-            if brand_id and not self.fromTable_id_exists('brand', brand_id):
-                raise ValueError(f"{brand_id} brand_id does not exist in the database")
-            if product_price < 0:
-                raise ValueError("product_price cannot be lower than 0")
-            if product_price is None:
-                raise ValueError("product needs to have a price")
+            # if self.fromTable_id_exists('product', product_id):
+            #     raise NameError(f"{product_id} already exists in the database")
+            # if brand_id and not self.fromTable_id_exists('brand', brand_id):
+            #     raise ValueError(f"{brand_id} brand_id does not exist in the database")
+            # if product_price < 0:
+            #     raise ValueError("product_price cannot be lower than 0")
+            # if product_price is None:
+            #     raise ValueError("product needs to have a price")
 
             if brand_id:
                 query = "INSERT INTO product (product_id, product_price, brand_id) VALUES " \

@@ -28,7 +28,6 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
         #Does event_type exist
         if not mySQL.fromTable_name_exists('event_type', event_type):
             mySQL.add_event_type(event_type)
-        
         #Does brand exist
         if brand and not mySQL.fromTable_name_exists('brand', brand):
             mySQL.add_brand(brand)
