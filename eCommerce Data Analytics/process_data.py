@@ -19,11 +19,11 @@ brand_dict = {}
 product_dict = {} #Contains dictionaries in which it has product_price, brand_id, and next_product_id
 user_session_dict = {} #Contains a hashmap with user_session_id as the key and has values of the end_time and start_time
 product_event_list = [] #List of dictionaries which has product_id, event_type and user_id
-user_activity_category_list = []
-user_activity_nocategory_list = []
-category_list = []
+user_activity_list = []
 
-for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eCommerce Data Analytics\\data\\2019-Oct.csv', chunksize=10000):
+category_list = {}
+
+for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eCommerce Data Analytics\\data\\2019-Oct.csv', chunksize=15000):
     for index, row in df.iterrows():
         event_time = row['event_time']
         event_type = row['event_type']
@@ -46,37 +46,24 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
 
             brand_data = mySQL.getTable_from_name('brand', brand)
             brand_dict[brand_data[1]] = brand_data[0]
-        #Does product_id exist in dictionary add if not so
-        if product_id not in product_dict:
-            if not mySQL.fromTable_id_exists('product', product_id):
-                if type(brand) == str:
-                    brand_id = mySQL.getTable_from_name('brand', brand)[0]
-                    mySQL.add_product(product_id, price, brand_id)
-                    product_dict[product_id] = {"product_price": price,
-                    "brand": brand_dict[brand]}
-                    continue
-                else:
-                    mySQL.add_product(product_id, price)
-            product_data = mySQL.getTable_from_id('product', product_id)
-            if type(brand) == str:
-                product_dict[product_id] = {"product_price": price,
-                "brand": brand_dict[brand]}
-                continue
-            product_dict[product_id] = {"product_price": price}
+
             
         #Does category_code exist
+        current_category_id = None
         category_parent = 1
         if type(category_code) == str:
             for category_name in mySQL.parse_category(category_code):
                 if category_name in category_list:
+                    category_parent = category_list[category_name]
                     continue
                 if not mySQL.fromTable_name_exists("category", category_name):
                     mySQL.add_category(category_name, category_parent)
-                category_parent = int(mySQL.getTable_from_name('category', category_name)[0])
-                category_list.append(category_name)
+                category_list[category_name] = int(mySQL.getTable_from_name('category', category_name)[0])
+                category_parent = category_list[category_name]
 
         if category_parent != 1:
             current_category_id = category_parent
+            
 
         #Does price exist
         try:
@@ -85,6 +72,24 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
         except Exception as e:
             print(e)
             continue
+
+        #Does product_id exist in dictionary add if not so
+        if product_id not in product_dict:
+            if not mySQL.fromTable_id_exists('product', product_id):
+                if type(brand) == str and current_category_id != None:
+                    brand_id = mySQL.getTable_from_name('brand', brand)[0]
+                    mySQL.add_product(product_id, price, brand_id, current_category_id)
+                elif type(brand) == str:
+                    brand_id = mySQL.getTable_from_name('brand', brand)[0]
+                    mySQL.add_product(product_id, price, brand_id)
+                elif current_category_id != None:
+                    mySQL.add_product(product_id, price, category_id=current_category_id)
+                else:
+                    mySQL.add_product(product_id, price)
+                    
+            product_data = mySQL.getTable_from_id('product', product_id)
+            
+            product_dict[product_id] = {"product_price": price}
         #Does user_id exist if not, add user
         mySQL.add_user(user_id)
         
@@ -118,37 +123,28 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
         product_event = {"product_id": product_id, "event_type": event_type, "user_id": user_id, 'price': price}
         product_event_list.append(product_event)
         #Add the user_activity to list
-        if category_parent != 1:
-            user_activity = {"user_id": user_id, "event_type": event_type, "product_id": product_id,
-                            "user_session_id": user_session_id, "event_time": event_time,
-                            "category_id": current_category_id}
-            user_activity_category_list.append(user_activity)
-        else:
-            user_activity = {"user_id": user_id, "event_type": event_type, "product_id": product_id,
-                            "user_session_id": user_session_id, "event_time": event_time,
-                            }
-            user_activity_nocategory_list.append(user_activity)
-    print(f"Processed {count*10000}")
+        user_activity = {"user_id": user_id, "event_type": event_type, "product_id": product_id,
+                        "user_session_id": user_session_id, "event_time": event_time}
+        user_activity_list.append(user_activity)
+
+    print(f"Processed {count*15000}")
     count += 1
     if len(product_event_list) > 50000:
         mySQL.batch_product_event(product_event_list)
-        product_event_list = []
         print(f"Added {len(product_event_list)} product_events to the database")
-    if len(user_activity_category_list)+len(user_activity_nocategory_list) > 50000:
-        mySQL.batch_user_activity_cat(user_activity_category_list)
-        mySQL.batch_user_activity_nocat(user_activity_nocategory_list)
-        user_activity_category_list = []
-        user_activity_nocategory_list = []
-        print(f"Added {len(user_activity_category_list)+len(user_activity_nocategory_list)} user_activity to the database")
+        product_event_list = []
+
+    if len(user_activity_list) > 50000:
+        mySQL.batch_user_activity(user_activity_list)
+        print(f"Added {len(user_activity_list)} user_activity to the database")
+        user_activity_list = []
         
-    if count % 35 == 0:
+    if count % 100 == 0:
         brand_dict = {}
         product_dict = {} #Contains dictionaries in which it has product_price, brand_id, and next_product_id
         user_session_dict = {} #Contains a hashmap with user_session_id as the key and has values of the end_time and start_time
-        category_list = []
+        category_list = {}
 
 mySQL.batch_product_event(product_event_list)
 print(f"Added remaining {len(product_event_list)} product events to the database")
-mySQL.batch_user_activity_cat(user_activity_category_list)
-mySQL.batch_user_activity_nocat(user_activity_nocategory_list)
-print(f"Added remaining {len(user_activity_category_list)+len(user_activity_nocategory_list)} user activity to the database")
+print(f"Added remaining {len(user_activity_list)} user activity to the database")

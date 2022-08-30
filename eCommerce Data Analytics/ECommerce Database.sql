@@ -21,6 +21,7 @@ CREATE TABLE `product` (
   `product_name` varchar(255),
   `product_price` double NOT NULL,
   `brand_id` bigint,
+  `category_id` bigint,
   `product_active` boolean DEFAULT true
 );
 
@@ -45,7 +46,6 @@ CREATE TABLE `user_activity` (
   `event_time` datetime,
   `event_type_id` bigint NOT NULL,
   `product_id` bigint NOT NULL,
-  `category_id` bigint,
   `user_id` bigint NOT NULL,
   `user_session_id` char(36) NOT NULL,
   `user_activity_active` boolean DEFAULT true
@@ -79,13 +79,13 @@ ALTER TABLE `category` ADD FOREIGN KEY (`category_parent`) REFERENCES `category`
 
 ALTER TABLE `product` ADD FOREIGN KEY (`brand_id`) REFERENCES `brand` (`brand_id`);
 
+ALTER TABLE `product` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`);
+
 ALTER TABLE `user_session` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 ALTER TABLE `user_activity` ADD FOREIGN KEY (`event_type_id`) REFERENCES `event_type` (`event_type_id`);
 
 ALTER TABLE `user_activity` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
-
-ALTER TABLE `user_activity` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`);
 
 ALTER TABLE `user_activity` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 

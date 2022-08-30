@@ -3,6 +3,7 @@ from itertools import product
 from multiprocessing.sharedctypes import Value
 from sqlite3 import connect
 from tokenize import Double
+from unicodedata import category
 import mysql.connector
 from mysql.connector import Error
 import json
@@ -349,7 +350,7 @@ class SQL:
             print(e)
 
 
-    def add_product(self, product_id: str, product_price: float, brand_id: int = None):
+    def add_product(self, product_id: str, product_price: float, brand_id: int = None, category_id = None):
         try:
             # if self.fromTable_id_exists('product', product_id):
             #     raise NameError(f"{product_id} already exists in the database")
@@ -360,9 +361,15 @@ class SQL:
             # if product_price is None:
             #     raise ValueError("product needs to have a price")
 
-            if brand_id:
+            if brand_id and category_id:
+                query = "INSERT INTO product (product_id, product_price, brand_id, category_id) VALUES " \
+                    f"('{product_id}', {product_price}, '{brand_id}', {category_id})"
+            elif brand_id:
                 query = "INSERT INTO product (product_id, product_price, brand_id) VALUES " \
                     f"('{product_id}', {product_price}, '{brand_id}')"
+            elif category_id:
+                query = "INSERT INTO product (product_id, product_price, category_id) VALUES " \
+                    f"('{product_id}', {product_price}, '{category_id}')"
             else:
                 query = "INSERT INTO product (product_id, product_price) VALUES " \
                     f"('{product_id}', {product_price})"
@@ -552,28 +559,7 @@ class SQL:
             print(e)
 
 
-    def batch_user_activity_cat(self, batch_user_activity):
-        query = "INSERT INTO user_activity (user_id, event_type_id, product_id, user_session_id, event_time, category_id) VALUES "
-
-        for user_activity in batch_user_activity:
-            if user_activity['event_type'] == "view":
-                event_type_id = 1
-            elif user_activity['event_type'] == "cart":
-                event_type_id = 2
-            elif user_activity['event_type'] == "remove_from_cart":
-                event_type_id = 3
-            else:
-                event_type_id = 4
-
-            query += f"({user_activity['user_id']}, {event_type_id}, {user_activity['product_id']}," \
-            f"'{user_activity['user_session_id']}', '{user_activity['event_time']}', {user_activity['category_id']}), " 
-
-        if query[-2:] == ", ":
-            query = query[:-2]
-            self.cursor.execute(query)
-            self.conn.commit()
-
-    def batch_user_activity_nocat(self, batch_user_activity):
+    def batch_user_activity(self, batch_user_activity):
         query = "INSERT INTO user_activity (user_id, event_type_id, product_id, user_session_id, event_time) VALUES "
 
         for user_activity in batch_user_activity:
