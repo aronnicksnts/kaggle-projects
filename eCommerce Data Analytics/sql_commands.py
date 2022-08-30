@@ -506,3 +506,92 @@ class SQL:
             return categories
         except Exception as e:
             print(e)
+
+
+    def batch_product_event(self, batch_product_event):
+        try:
+            # if not self.fromTable_id_exists('product', product_id):
+            #     raise ValueError("product_id does not exist in the database")
+            # if not self.fromTable_name_exists('event_type', event_type_name):
+            #     raise ValueError("event_type_name does not exist in the database")
+            query_view = "INSERT INTO product_view (product_id, user_id) VALUES "
+            query_add_cart = "INSERT INTO product_add_cart (product_id, user_id) VALUES "
+            query_purchase = "INSERT INTO product_purchase (product_id, user_id) VALUES "
+            query_remove_cart = "INSERT INTO product_remove_cart (product_id, user_id) VALUES "
+            for product_event in batch_product_event:
+                if product_event['event_type'] == "view":
+                    product_event['event_type'] = "view"
+                    query_view += f"({product_event['product_id']}, {product_event['user_id']}), "
+                elif product_event['event_type'] == "cart":
+                    product_event['event_type'] = "add_cart"
+                    query_add_cart += f"({product_event['product_id']}, {product_event['user_id']}), "
+                elif product_event['event_type'] == "remove_from_cart":
+                    product_event['event_type'] = "removed_cart"
+                    query_remove_cart += f"({product_event['product_id']}, {product_event['user_id']}), "
+                else:
+                    product_event['event_type'] = "purchase"
+                    price = product_event['price']
+                    query_purchase += f"({product_event['product_id']}, {product_event['user_id']}), "
+                    data = {"user_spent": price}
+                    self.modify_user(product_event['user_id'], **data)
+
+            if query_view[-2:] == ", ":
+                query_view = query_view[:-2]
+                self.cursor.execute(query_view)
+            if query_add_cart[-2:] == ", ":
+                query_add_cart = query_add_cart[:-2]
+                self.cursor.execute(query_add_cart)
+            if query_purchase[-2:] == ", ":
+                query_purchase = query_purchase[:-2]
+                self.cursor.execute(query_purchase)
+            if query_remove_cart[-2:] == ", ":
+                query_remove_cart = query_remove_cart[:-2]
+                self.cursor.execute(query_remove_cart)
+            self.conn.commit()
+        except Exception as e:
+            print(e)
+
+
+    def batch_user_activity_cat(self, batch_user_activity):
+        query = "INSERT INTO user_activity (user_id, event_type_id, product_id, user_session_id, event_time, category_id) VALUES "
+
+        for user_activity in batch_user_activity:
+            if user_activity['event_type'] == "view":
+                event_type_id = 1
+            elif user_activity['event_type'] == "cart":
+                event_type_id = 2
+            elif user_activity['event_type'] == "remove_from_cart":
+                event_type_id = 3
+            else:
+                event_type_id = 4
+
+            query += f"({user_activity['user_id']}, {event_type_id}, {user_activity['product_id']}," \
+            f"'{user_activity['user_session_id']}', '{user_activity['event_time']}', {user_activity['category_id']}), " 
+
+        if query[-2:] == ", ":
+            query = query[:-2]
+            self.cursor.execute(query)
+            self.conn.commit()
+
+    def batch_user_activity_nocat(self, batch_user_activity):
+        query = "INSERT INTO user_activity (user_id, event_type_id, product_id, user_session_id, event_time) VALUES "
+
+        for user_activity in batch_user_activity:
+            if user_activity['event_type'] == "view":
+                event_type_id = 1
+            elif user_activity['event_type'] == "cart":
+                event_type_id = 2
+            elif user_activity['event_type'] == "remove_from_cart":
+                event_type_id = 3
+            else:
+                event_type_id = 4
+
+            if type(user_activity['event_time']) == str:
+                self.convert_str_datetime(user_activity['event_time'])
+            query += f"({user_activity['user_id']}, {event_type_id}, {user_activity['product_id']}," \
+            f"'{user_activity['user_session_id']}', '{user_activity['event_time']}'), " 
+
+        if query[-2:] == ", ":
+            query = query[:-2]
+            self.cursor.execute(query)
+            self.conn.commit()

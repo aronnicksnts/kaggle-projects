@@ -1,0 +1,47 @@
+store most recent used products - Write then Flush data once 350,000 data processed
+store most recent brand - Write then Flush data once 350,000 data processed
+store most recent user_session - replace oldest one once full - Write then Flush data once 350,000 data processed
+store most recent category - Write then Flush data once 350,000 data processed
+
+store 50,000 product_add_event_type insert queries once full, query all, clear store
+store 50,000 user_activity insert queries, once full, query all
+
+Once user session about to be replaced, update user_session start_time and end_time
+
+brand =		{"brand_name": brand_id
+
+products = 	{"product_id": 
+			{"product_price": product_price,
+			"brand": brand_id}
+		}
+
+user_session = 	{"user_session_id": 
+			{"user_session_start_time": datetime.datetime, 
+			"user_sesssion_end_time": datetime.datetime}
+		}
+
+
+
+product_events = [
+			{"product_id": product_id, 
+			"event_type": event_type_id,
+			"user_id": user_id}
+		]
+
+user_activity_with_category =	[
+			{"user_id": user_id,
+			"event_type": event_type_id,
+			"product_id": product_id,
+			"user_session_id": user_session_id
+			"event_time": event_time
+			"category_id": category_id
+		]
+
+user_activity_without_category =	[
+			{"user_id": user_id,
+			"event_type": event_type_id,
+			"product_id": product_id,
+			"user_session_id": user_session_id
+			"event_time": event_time
+			"category_id": category_id
+		]
