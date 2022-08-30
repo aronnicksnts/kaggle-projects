@@ -23,3 +23,10 @@ Additionally, there is extra additional archives that goes from December 2019 - 
 ## ERD of the Database
 The data from kaggle would be transformed to a MySQL file which has the following tables.
 ![ECommerce ERD](https://github.com/aronnicksnts/kaggle-projects/blob/main/eCommerce%20Data%20Analytics/ECommerce%20ERD.png)
+
+## Scope and Limits
+It is unsure (Will be checked on the future) on if this particular database contains moments where the price of a particular product changes from one point in time to another (Sales). As such, it is assumed that the first encounter of a particular product is its price. The product price is therefore static in this report.
+
+Unfortunately, from one of the discussion in [Kaggle](https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/discussion/230883), it appears that due to event tracking errors, purchase events from 2019-11-15 and 2020-01-02 is not included.
+
+Additionally, it appears that the brand name of a product may change as stated [here](https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/discussion/129303), for this study, it will be assumed that one product_id will have a brand, but if the brand name ever changes in any event, that will not be included in the report. This is to increase the speed in preprocessing the database
