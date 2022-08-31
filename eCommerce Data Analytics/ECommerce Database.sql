@@ -7,7 +7,7 @@ CREATE TABLE `category` (
 
 CREATE TABLE `brand` (
   `brand_id` bigint PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `brand_name` varchar(30) UNIQUE,
+  `brand_name` varchar(80) UNIQUE,
   `brand_active` boolean DEFAULT true
 );
 

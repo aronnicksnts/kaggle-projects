@@ -22,9 +22,11 @@ product_event_list = [] #List of dictionaries which has product_id, event_type a
 user_activity_list = []
 
 category_list = {}
+check = 1
 
 for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eCommerce Data Analytics\\data\\2019-Oct.csv', chunksize=15000):
     for index, row in df.iterrows():
+
         event_time = row['event_time']
         event_type = row['event_type']
         product_id = row['product_id']
@@ -34,12 +36,18 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
         user_id = row['user_id']
         user_session_id = row['user_session']
 
+        if check:
+            if count*15000 < 28710000:
+                break
+            if user_session_id != '8dc00a6f-87ef-4c32-abfa-4c0f07143a98' and event_time != '2019-10-21-15 15:00:28 UTC':
+                continue
+            check = 0
+            continue
         #Does event_type exist
         # if not mySQL.fromTable_name_exists('event_type', event_type):
         #     mySQL.add_event_type(event_type)
 
         #Is brand in dictionary add if not so
-        
         if type(brand) == str and brand not in brand_dict:
             if brand and not mySQL.fromTable_name_exists('brand', brand):
                 mySQL.add_brand(brand)
