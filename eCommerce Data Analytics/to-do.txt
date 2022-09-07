@@ -21,57 +21,13 @@ functions -
 connect() - return if connected
 disconnect()
 
-get_random_number() - return randomInt
-generate_random_id() - return random char(36)
-fromTable_id_exists(table_name, id) - returns boolean - checks if id exists in a particular table
-fromTable_name_exists(table_name, name) - returns boolean
-getTable_from_id(table_name, id) - returns the values of the id from the table
+createNewDate(datetime.date) - create new row Dim_Date per day
+checkDateExists(datetime.date)
+getDateTable(dateKey)
+createNewProduct(productId, categoryId, price, categoryName: None, brand: None)
+checkProductExists(productId)
+getProductTable(productId)
+checkBrandorPriceChange(productId, brand: None, price: None)
 
-add_category(category_parent, category_name)
-modify_category(category_id, data)
-remove_category(category_id)
-=====================
-
-add_user(user_name)
-modify_user(user_id, data)
-=======================
-add_brand(brand_name)
-modify_brand(brand_id, data)
-
-add_event_type(event_type_name)
-modify_event_type(event_type_id, data)
-==========================
-add_user_session(user_session_id, data)
-modify_user_session(user_session_id, data)
-
-add_product(product_id, data)
-modify_product(product_id, data)
-=================================
-add_user_activity(user_id, **data)
-
-get_user_session_between_date_exists(user_id, start_date, end_date) - boolean
-get_user_session_between_date(user_id, start_date, end_date) - return tuple of user_sessions_id
-
-get_all_user_activity(user_id) - return all rows of user_activity of user
-get_user_activity_between(user_id, startTime, endTime) - get user activity between timeframe
-get_user_activity_event_type(user_id, event_type_id) - get user activity depending on event type
-get_user_activity_between_event_type(user_id, event_type_id, startTime, endTime) get user activity depending on event type on a particular timeframe
-get_user_activity_session_id(user_session_id) - return all rows of user_activity with user_session_id
-
-
-get_purchase_number_product(product_id) - return count of how many times product has been purchased
-get_view_number_product(product_id) - return count of how many times product has been viewed
-get_add_cart_product(product_id) - returns count of how many times product has been added to cart
-product_add_event_type(product_id, event_type)
-
-
-user_add_purchase(user_id, user_spent) - When user purchases/refunds a product
-user_add_active_time(user_id, amount_time) - Once a user session ends add total time
-
-parse_category(category)
-get_children_category(category_id)
-get_parent_category(category_id)
-
-
-l8r to do:
-modify_user_activity(user_activity_id, data)
+createNewFactProduct(productKey, dateKey, event_type)
+incrementFactProduct(productKey, dateKey, event_type)
