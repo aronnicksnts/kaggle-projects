@@ -20,6 +20,7 @@ Additionally, there is extra additional archives that goes from October 2019 - A
 
 ## ERD of the Database
 The data from kaggle would be transformed to a MySQL file which has the following tables.
+![ECommerce DataWarehouse](https://github.com/aronnicksnts/kaggle-projects/blob/main/eCommerce%20Data%20Analytics/ECommerce%20ERD.png)
 
 
 ## Scope and Limits
