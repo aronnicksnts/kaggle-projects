@@ -36,10 +36,11 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
         user_id = row['user_id']
         user_session_id = row['user_session']
 
+        #Due to error, needed to go back to the 28 millionth entry
         if check:
-            if count*15000 < 28710000:
+            if count*15000 < 33540000:
                 break
-            if user_session_id != '8dc00a6f-87ef-4c32-abfa-4c0f07143a98' and event_time != '2019-10-21-15 15:00:28 UTC':
+            if user_session_id != 'fee1a5d3-ac69-4b07-a57e-1c38268103c0' and event_time != '2019-10-25 05:27:37 UTC':
                 continue
             check = 0
             continue
