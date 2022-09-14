@@ -1,5 +1,5 @@
 CREATE TABLE `Dim_Date` (
-  `dateKey` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `dateKey` bigint PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `dateNum` date NOT NULL,
   `monthNum` int NOT NULL,
   `monthName` varchar(10) NOT NULL,
@@ -11,11 +11,11 @@ CREATE TABLE `Dim_Date` (
 );
 
 CREATE TABLE `Dim_Product` (
-  `productKey` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `productId` int NOT NULL,
-  `categoryId` int NOT NULL,
+  `productKey` bigint PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `productId` bigint NOT NULL,
+  `categoryId` bigint NOT NULL,
   `categoryName` varchar(128),
-  `price` int NOT NULL,
+  `price` float8 NOT NULL,
   `brand` varchar(50),
   `activeFlag` boolean DEFAULT True
 );
@@ -25,10 +25,10 @@ CREATE TABLE `Dim_Event_Type` (
 );
 
 CREATE TABLE `Fact_Product` (
-  `productKey` int NOT NULL,
-  `dateKey` int NOT NULL,
+  `productKey` bigint NOT NULL,
+  `dateKey` bigint NOT NULL,
   `event_type` varchar(30) NOT NULL,
-  `counter` int DEFAULT 1,
+  `counter` bigint DEFAULT 1,
   PRIMARY KEY (`productKey`, `dateKey`, `event_type`)
 );
 

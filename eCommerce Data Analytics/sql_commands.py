@@ -34,8 +34,8 @@ class SQL:
         except Error as e:
             print("Error: ", e)
 
-    def createNewDate(self, date: datetime.datetime):
-        dateNum = date.date()
+    def createNewDate(self, date: datetime.date):
+        dateNum = date
         monthNum = dateNum.month
         monthName = dateNum.strftime("%B")
         monthShortName = dateNum.strftime("%b")
@@ -47,12 +47,10 @@ class SQL:
         query = "INSERT INTO DIM_DATE (dateNum, monthNum, monthName, monthShortName, dayNum, dayOfWeek," \
             f"yearNum, quarter) VALUES ('{dateNum}', {monthNum}, '{monthName}', '{monthShortName}', {dayNum}, " \
                 f"{dayOfWeek}, {yearNum}, {quarter})"
-        print(query)
         self.cursor.execute(query)
         self.conn.commit()
 
-    def checkDateExists(self, date: datetime.datetime) -> bool:
-        date = date.date()
+    def checkDateExists(self, date: datetime.date) -> bool:
         query = f"SELECT EXISTS (SELECT * FROM Dim_Date WHERE dateNum = '{date}')"
         self.cursor.execute(query)
         if self.cursor.fetchone()[0] == 0:
@@ -60,7 +58,6 @@ class SQL:
         return True
 
     def getDateKey(self, date):
-        date = date.date()
         query = f"SELECT dateKey FROM Dim_Date WHERE dateNum = '{date}'"
         self.cursor.execute(query)
         return self.cursor.fetchone()[0]
@@ -108,8 +105,30 @@ class SQL:
         return self.cursor.fetchone()
 
     def checkProductChange(self, productId, categoryName= None, categoryId= None, brand= None, price= None):
-        pass
+        query = f"SELECT * FROM dim_product WHERE productId = '{productId}' AND activeFlag = 1"
+        self.cursor.execute(query)
+        oldProduct = self.cursor.fetchone()
+        newProduct = (productId, categoryId, categoryName, price, brand)
+        if oldProduct[1:] != newProduct:
+            self.disableProduct(oldProduct[0])
+            self.createNewProduct(productId, categoryId, price, categoryName, brand)
 
-    def disableProduct(self, productId):
-        pass
+    def disableProduct(self, productKey):
+        query = f"UPDATE Dim_Product SET activeFlag = 0 WHERE productKey = {productKey}"
+        self.cursor.execute(query)
+        self.conn.commit()
 
+    
+    def createFactProduct(self, productKey, dateKey, event_type):
+        query = "INSERT INTO Fact_Product (productKey, dateKey, event_type) VALUES " \
+            f"({productKey}, {dateKey}, '{event_type}')"
+        
+        self.cursor.execute(query)
+        self.conn.commit()
+
+    
+    def incrementFactProduct(self, productKey, dateKey, event_type):
+        query = "UPDATE Fact_Product SET counter = counter + 1 WHERE " \
+            f"productKey = {productKey} AND dateKey = {dateKey} AND event_type = '{event_type}'"
+        self.cursor.execute(query)
+        self.conn.commit()
