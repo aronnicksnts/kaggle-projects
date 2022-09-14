@@ -27,3 +27,5 @@ The data from kaggle would be transformed to a MySQL file which has the followin
 Unfortunately, from one of the discussion in [Kaggle](https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store/discussion/230883), it appears that due to event tracking errors, purchase events from 2019-11-15 and 2020-01-02 is not included.
 
 This project would not be able to determine individual user activities as the data events are aggregated to a summary of a whole day.
+
+Additionally, it would not be able to check if a product has changed prices in the middle of the day. It would be able to account for it the next day.
