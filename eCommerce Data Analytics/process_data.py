@@ -14,9 +14,8 @@ files = glob.glob(os.path.join(os.getcwd()+"\\data", "*.csv"))
 # for file in files:
 count = 1
 #Initialization of lists
-product_dict = {}
 currentDate = None
-
+product_dict = {}
 
 for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eCommerce Data Analytics\\data\\2019-Oct.csv', chunksize=15000):
     df = df.fillna("")
@@ -31,10 +30,12 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
             dateKey = mySQL.getDateKey(currentDate)
             product_dict = {}
         
-        #Check product_id in product_dict
-        if not row['product_id'] in product_dict:
+        if row['product_id'] not in product_dict:
             if not mySQL.checkProductExists(row['product_id']):
                 mySQL.createNewProduct(row['product_id'], row['category_id'], row['price'], row['category_code'], row['brand'])
+                productKey = mySQL.getLastProduct()
+                mySQL.addFactProduct(productKey, dateKey, row['event_type'])
+                continue
             #Compare current product
             productInfo = mySQL.getProductTable(row['product_id'])
             productKey = productInfo[0]
@@ -50,16 +51,10 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
                 or brand != row['brand']:
                 mySQL.disableProduct(productInfo[0])
                 mySQL.createNewProduct(row['product_id'], row['category_id'], row['price'], row['category_code'], row['brand'])
-                productInfo = mySQL.getProductTable(row['product_id'])
-                productKey = productInfo[0]
-
+                productKey = mySQL.getLastProduct()
             product_dict[row['product_id']] = productKey
 
-            #Create new Fact Product
-            mySQL.createFactProduct(productKey, dateKey, row['event_type'])
-        
-        else:
-            mySQL.incrementFactProduct(product_dict[row['product_id']], dateKey, row['event_type'])
+        mySQL.addFactProduct(product_dict[row['product_id']], dateKey, row['event_type'])
 
     print(f"Processed {count*15000}")
     count += 1

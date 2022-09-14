@@ -5,3 +5,11 @@ TRUNCATE dim_product;
 TRUNCATE fact_product;
 SET FOREIGN_KEY_CHECKS = 1;
 INSERT INTO dim_event_type (eventType) VALUES ("view"), ("cart"), ("remove_from_cart"), ("purchase");
+
+
+
+SELECT dim_product.productId, dim_product.categoryName, dim_product.brand, 
+dim_product.price, fact_product.counter, fact_product.productKey,
+dim_product.price*fact_product.counter as total_revenue FROM
+fact_product INNER JOIN dim_product ON dim_product.productKey = fact_product.productKey 
+WHERE fact_product.event_type = 'purchase';
