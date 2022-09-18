@@ -16,11 +16,18 @@ count = 1
 #Initialization of lists
 currentDate = None
 product_dict = {}
+fact_product = {}
+check = 0
 
 for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eCommerce Data Analytics\\data\\2019-Oct.csv', chunksize=15000):
     df = df.fillna("")
     for index, row in df.iterrows():
-
+        if count*15000 < 8355000:
+            break
+        if not check:
+            if index+(count*15000) != 8362022:
+                check = 1
+                continue
         #Check Date is current date and if not, refresh product_dict
         currDate = datetime.datetime.strptime(str(row['event_time'][:-4]), '%Y-%m-%d %H:%M:%S').date()
         if currDate != currentDate:
@@ -29,12 +36,14 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
             currentDate = currDate
             dateKey = mySQL.getDateKey(currentDate)
             product_dict = {}
-        
+            fact_product = {}
         if row['product_id'] not in product_dict:
             if not mySQL.checkProductExists(row['product_id']):
                 mySQL.createNewProduct(row['product_id'], row['category_id'], row['price'], row['category_code'], row['brand'])
                 productKey = mySQL.getLastProduct()
-                mySQL.addFactProduct(productKey, dateKey, row['event_type'])
+                mySQL.createFactProduct(productKey, dateKey, row['event_type'])
+                product_dict[row['product_id']] = productKey
+                fact_product[productKey] = [row['event_type']]
                 continue
             #Compare current product
             productInfo = mySQL.getProductTable(row['product_id'])
@@ -53,8 +62,20 @@ for df in pd.read_csv('D:\\Desktop Folder\\Self Projects\\kaggle-projects\\eComm
                 mySQL.createNewProduct(row['product_id'], row['category_id'], row['price'], row['category_code'], row['brand'])
                 productKey = mySQL.getLastProduct()
             product_dict[row['product_id']] = productKey
+            fact_product[productKey] = [row['event_type']]
 
-        mySQL.addFactProduct(product_dict[row['product_id']], dateKey, row['event_type'])
+            mySQL.createFactProduct(product_dict[row['product_id']], dateKey, row['event_type'])
+        
+        else:
+            productKey = product_dict[row['product_id']]
+            if productKey not in fact_product:
+                fact_product[productKey] = [row['event_type']]
+                mySQL.createFactProduct(productKey, dateKey, row['event_type'])
+            elif row['event_type'] not in fact_product[productKey]:
+                fact_product[productKey].append(row['event_type'])
+                mySQL.createFactProduct(productKey, dateKey, row['event_type'])
+            else:
+                mySQL.incrementFactProduct(productKey, dateKey, row['event_type'])
 
     print(f"Processed {count*15000}")
     count += 1

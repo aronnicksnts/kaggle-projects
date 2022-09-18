@@ -126,10 +126,15 @@ class SQL:
         self.conn.commit()
 
     
-    def addFactProduct(self, productKey, dateKey, event_type):
+    def createFactProduct(self, productKey, dateKey, event_type):
         query = "INSERT INTO Fact_Product (productKey, dateKey, event_type) VALUES " \
-            f"({productKey}, {dateKey}, '{event_type}') ON DUPLICATE KEY UPDATE " \
-                "counter = counter + 1"
-        
+            f"({productKey}, {dateKey}, '{event_type}') ON DUPLICATE KEY UPDATE COUNTER = COUNTER + 1"
+        self.cursor.execute(query)
+        self.conn.commit()
+
+
+    def incrementFactProduct(self, productKey, dateKey, event_type):
+        query = "UPDATE Fact_Product SET counter = counter + 1 WHERE " \
+            f"productKey = {productKey} AND dateKey = {dateKey} AND event_type = '{event_type}'"
         self.cursor.execute(query)
         self.conn.commit()
