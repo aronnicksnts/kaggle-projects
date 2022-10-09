@@ -3,10 +3,15 @@ Applying various methods to different kaggle projects. Mostly machine learning a
 
 
 ### Table of Contents
+- [Lemon Quality](#lemon-quality)
 - [Flower Recognition](#flower-recognition)
 - [Fortune Top 1000 Companies by Revenue 2022](#fortune-top-1000-companies-by-revenue-2022)
 - [Lung Disease Classification](#lung-disease-classification)
 - [Milk Quality Prediction](#milk-quality-prediction)
+
+## Lemon Quality
+
+The project aims to predict the quality of a lemon based on the image. There are three classifications of the lemon, a good quality lemon, a bad quality lemon, and an empty background. The AlexNet CNN architecture was used for the model. The model's hyperparameters were as follows: 10 epochs, 128 batch_size and 5-fold cross validation with 70% being the testing set and 30% being the test set. The model was able to achieve an accuracy of 99% with validation loss of 0.05
 
 ## Flower Recognition
 
