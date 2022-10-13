@@ -1,4 +1,4 @@
-# kaggle-projects
+# What it is about
 Applying various methods to different kaggle projects. Mostly machine learning and data analytics.
 
 
