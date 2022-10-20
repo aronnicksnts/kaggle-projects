@@ -3,11 +3,16 @@ Applying various methods to different kaggle projects. Mostly machine learning a
 
 
 ### Table of Contents
+- [Iowa Liquor Sales](#iowa-liquor-sales)
 - [Lemon Quality](#lemon-quality)
 - [Flower Recognition](#flower-recognition)
 - [Fortune Top 1000 Companies by Revenue 2022](#fortune-top-1000-companies-by-revenue-2022)
 - [Lung Disease Classification](#lung-disease-classification)
 - [Milk Quality Prediction](#milk-quality-prediction)
+
+## Iowa Liquor Sales
+
+A data visualization project where-in exploratory data analysis was applied. The following data was obtained: the city with the highest bottles sold, total bottles sold per year, what bottle was most sold, which stores has the highest revenue and if the number of bottles sold vary between each month.
 
 ## Lemon Quality
 
