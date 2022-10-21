@@ -3,12 +3,17 @@ Applying various methods to different kaggle projects. Mostly machine learning a
 
 
 ### Table of Contents
+- [Japan Real Estate Prediction](#japan-real-estate-prediction)
 - [Iowa Liquor Sales](#iowa-liquor-sales)
 - [Lemon Quality](#lemon-quality)
 - [Flower Recognition](#flower-recognition)
 - [Fortune Top 1000 Companies by Revenue 2022](#fortune-top-1000-companies-by-revenue-2022)
 - [Lung Disease Classification](#lung-disease-classification)
 - [Milk Quality Prediction](#milk-quality-prediction)
+
+## Japan Real Estate Prediction
+
+Application of three models to predict different house prices across Japan. Linear Regression, Multi-Layer Perceptron Regressor (MLPRegressor) and XGBoost were used as the models. Overall, the XGBoost was able to perform the highest with an average mean absolute percentage error (MAPE) of 63% compared to linear regression and MLPRegressor with an average MAPE value of 81% and 68% respectively.
 
 ## Iowa Liquor Sales
 
@@ -20,7 +25,7 @@ The project aims to predict the quality of a lemon based on the image. There are
 
 ## Flower Recognition
 
-Utilizes the knn algorithm and cnn to try and predict what type of flower is in the photo. With the knn algorithm, the model was able to get an accuracy of 35%. The cnn had a total of 10 epochs and was able to perform better compared to the knn algorithm, with an accuracy of 62%.
+Utilization of knn algorithm and cnn to try and predict what type of flower is in the photo. With the knn algorithm, the model was able to get an accuracy of 35%. The cnn had a total of 10 epochs and was able to perform better compared to the knn algorithm, with an accuracy of 62%.
 
 ## Fortune Top 1000 Companies by Revenue 2022
 
