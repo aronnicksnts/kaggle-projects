@@ -13,7 +13,7 @@ Applying various methods to different kaggle projects. Mostly machine learning a
 
 ## Japan Real Estate Prediction
 
-Application of three models to predict different house prices across Japan. Linear Regression, Multi-Layer Perceptron Regressor (MLPRegressor) and XGBoost were used as the models. Overall, the XGBoost was able to perform the highest with an average mean absolute percentage error (MAPE) of 63% compared to linear regression and MLPRegressor with an average MAPE value of 81% and 68% respectively.
+Preprocessing of the data and application of four models to predict different house prices across Japan. Linear Regression, Multi-Layer Perceptron Regressor (MLPRegressor), XGBoost, and Random Forest (RF) were used as the models. Overall, the RF was able to perform the highest with an average mean absolute percentage error (MAPE) of 43% compared to linear regression, MLPRegressor and with an average MAPE value of 60%, 50%, and 46% respectively.
 
 ## Iowa Liquor Sales
 
